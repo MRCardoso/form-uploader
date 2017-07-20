@@ -27,6 +27,7 @@
     "tests"
   ],
   "dependencies": {
+    "angular": "^1.6.5",
     "angular-file-upload": "^2.5.0"
   },
   "repository": {
