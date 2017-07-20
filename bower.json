@@ -1,6 +1,6 @@
 {
   "name": "form-uploader",
-  "version": "0.0.1",
+  "version": "0.0.5",
   "license": "MIT",
   "homepage": "https://github.com/MRCardoso/form-uploader",
   "description": "Create a template for upload files",
