@@ -1,0 +1,35 @@
+{
+  "name": "form-uploader",
+  "version": "0.0.1",
+  "license": "MIT",
+  "homepage": "https://github.com/MRCardoso/form-uploader",
+  "description": "Create a template for upload files",
+  "main": [
+    "dist/form-uploader.min.js",
+    "dist/form-uploader.min.css"
+  ],
+  "keywords": [
+    "form-uploader",
+    "file-uploader"
+  ],
+  "authors": [
+    "MRCardoso <marlonrcardoso@yahoo.com.br>"
+  ],
+  "ignore": [
+    "**/.*",
+    "node_modules",
+    "bower_components",
+    "package.json",
+    "src",
+    "public",
+    "test",
+    "tests"
+  ],
+  "dependencies": {
+    "angular-file-upload": "^2.5.0"
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/MRCardoso/form-uploader.git"
+  }
+}
