@@ -56,6 +56,17 @@ angular.module('form.uploader')
                 
                 /*
                 | ----------------------------------------------------------------------
+                | Validate the type of file uploaded
+                | ----------------------------------------------------------------------
+                */
+                $scope.isImage = function(isHtml5, file){
+                    if( /(gif|jpg|jpeg|png|x-png|pjpeg)/.test(file.type) )
+                        return isHtml5;
+                    return false;
+                }
+
+                /*
+                | ----------------------------------------------------------------------
                 | Delete the image object from s3
                 | ----------------------------------------------------------------------
                 */
