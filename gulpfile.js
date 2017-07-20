@@ -30,7 +30,7 @@ gulp.task('scripts-prod', ['template'], function() {
 
 gulp.task('template', function() {
   return gulp.src('src/templates/**/*.html')
-    .pipe(ngTemplates({ module: 'table.grid' }))
+    .pipe(ngTemplates({ module: 'form.uploader' }))
     .pipe(rename('form-uploader.tpl.js'))
     .pipe(gulp.dest('src/js'));
 });

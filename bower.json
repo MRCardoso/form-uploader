@@ -5,8 +5,8 @@
   "homepage": "https://github.com/MRCardoso/form-uploader",
   "description": "Create a template for upload files",
   "main": [
-    "dist/form-uploader.min.js",
-    "dist/form-uploader.min.css"
+    "dist/form-uploader.js",
+    "dist/form-uploader.css"
   ],
   "keywords": [
     "form-uploader",
@@ -20,6 +20,7 @@
     "node_modules",
     "bower_components",
     "package.json",
+    "server.js",
     "src",
     "public",
     "test",
@@ -31,5 +32,11 @@
   "repository": {
     "type": "git",
     "url": "https://github.com/MRCardoso/form-uploader.git"
+  },
+  "devDependencies": {
+    "bootstrap": "^3.3.7",
+    "angular-route": "^1.6.5",
+    "angular-resource": "^1.6.5",
+    "jquery": "^3.2.1"
   }
 }

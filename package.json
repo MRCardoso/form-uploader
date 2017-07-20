@@ -1,0 +1,39 @@
+{
+  "name": "form-uploader",
+  "version": "0.0.1",
+  "authors": "MRCardoso <marlonrcardoso@yahoo.com.br>",
+  "description": "Create a template for upload files",
+  "license": "MIT",
+  "main": "public/index.ejs",
+  "dependencies": {
+    "gulp": "^3.9.1",
+    "gulp-angular-templatecache": "^2.0.0",
+    "gulp-autoprefixer": "^4.0.0",
+    "gulp-clean": "^0.3.2",
+    "gulp-concat": "^2.6.1",
+    "gulp-minify-css": "^1.2.4",
+    "gulp-plumber": "^1.1.0",
+    "gulp-rename": "^1.2.2",
+    "gulp-uglify": "^3.0.0",
+    "gulp-minify": "^1.0.0",
+    "browser-sync": "^2.18.12",
+    "del": "^2.2.2"
+  },
+  "keywords": [
+    "angularjs",
+    "form-uploader",
+    "file-uploader"
+  ],
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/MRCardoso/form-uploader.git"
+  },
+  "devDependencies": {
+    "body-parser": "^1.17.2",    
+    "ejs": "^2.5.6",
+    "express": "^4.8.8",
+    "fs": "0.0.1-security",
+    "open": "0.0.5",
+    "uploader-go-bucket": "^1.2.1"
+  }
+}

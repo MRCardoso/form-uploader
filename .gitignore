@@ -1,3 +1,5 @@
 form-uploader.json
 create.sh
 node_modules/
+public/bower_components/
+public/upload/

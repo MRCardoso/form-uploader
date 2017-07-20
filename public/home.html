@@ -1,0 +1,21 @@
+<div ng-controller="FormController">
+    <div class="panel panel-default">
+        <div class="panel-heading">
+            Upload
+            <div class="pull-right">
+                <label class="control-label">
+                    <input type="checkbox" name="isMany" ng-model="isMany" value="true">
+                    Many
+                </label>
+            </div>
+        </div>
+        <div class="panel-body">
+            <form-uploader 
+                many="isMany" 
+                send-url="sendUrl" 
+                remove-url="removeUrl"
+                default-limit="100*1024*1024">
+            </form-uploader>
+        </div>
+    </div>    
+</div>

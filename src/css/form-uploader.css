@@ -1,5 +1,6 @@
-.my-drop-zone { border: dotted 3px #6F93C9; }
-.nv-file-over { border: dotted 3px #6C9E6A; } /* Default class applied to drop zones on over */
+ .my-drop-zone { border: dotted 3px #5E8FCD; } 
+/* Default class applied to drop zones on over */
+/* .nv-file-over { border: dotted 3px #6C9E6A; } */
 .file-group-item{
     width: 100%;
     padding: 5px;
@@ -27,4 +28,27 @@ canvas {
 }
 .clear{
     clear: both;
+}
+.loader{
+    animation-duration: 0.5s;
+    animation-iteration-count: infinite;
+    animation-timing-function: linear;
+    animation-name: loading;
+}
+
+@keyframes loading {
+        from{
+        -ms-transform: rotate(0deg);
+        -webkit-transform: rotate(0deg);
+        -moz-transform: rotate(0deg);
+        -o-transform: rotate(0deg);
+        transform: rotate(0deg);
+    }
+    to{
+        -ms-transform: rotate(360deg);
+        -webkit-transform: rotate(360deg);
+        -moz-transform: rotate(360deg);
+        -o-transform: rotate(360deg);
+        transform: rotate(360deg);
+    } 
 }
