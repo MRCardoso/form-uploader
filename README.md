@@ -84,6 +84,21 @@ The response pattern, must be a object equal to:
 * **success:** An Object with the proprerty 'message'
 * **error:** An Object with the proprerty 'message'
 
+## $broadcast event
+
+Event when the upload start
+```
+$rootScope.$on('form.uploader.begin', function(e){
+    // put here your method when the upload begin
+});
+```
+Event when the upload finish
+```
+$rootScope.$on('form.uploader.finish', function(e){
+    // put here your method when the upload finish
+});
+```
+
 ## Changelog
 
 Please see the [releases page](https://github.com/MRCardoso/form-uploader/releases) for details
