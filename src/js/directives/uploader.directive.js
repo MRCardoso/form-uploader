@@ -221,6 +221,7 @@ angular.module('form.uploader')
                 };
                 uploader.onBeforeUploadItem = function (item) {
                     item.showLoading = true;
+                    $scope.$root.$broadcast('form.uploader.begin');
                 };
                 uploader.onCancelItem = function (fileItem, response, status, headers)
                 {
@@ -253,6 +254,7 @@ angular.module('form.uploader')
                             $scope.messages.danger = response.message;
                         }
                     }
+                    $scope.$root.$broadcast('form.uploader.finish', response);
                 };
 
                 // uploader.onProgressItem = function (fileItem, progress) {};// have onProgressAll
