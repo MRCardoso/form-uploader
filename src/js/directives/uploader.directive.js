@@ -52,24 +52,7 @@ angular.module('form.uploader')
                 }
 
                 var listFile = [];
-                
-                /*
-                | ------------------------------------------------------------------------------------
-                | Default method, that call the http request for remove the uploaded file
-                | ------------------------------------------------------------------------------------
-                | in the 'data' property of the http response:
-                | success: object with the proprerty 'message'
-                | error: object with the proprerty 'message'
-                */
-                var removeFile = function(arrayFiles, callback){
-                    $http
-                    .post($scope.removeUrl, {Keys: arrayFiles})
-                    .then(function(reason){
-                        callback(reason);
-                    },function(err){
-                        $scope.messages.danger = err.data.message;
-                    });
-                }
+                var IImage = null;
                 /*
                 | ------------------------------------------------------------------------------------
                 | Default labels with the messages, for success, info or error in upload
@@ -153,6 +136,81 @@ angular.module('form.uploader')
                     {
                         uploader.clearQueue();
                     }
+                };
+
+                /**
+                | ------------------------------------------------------------------------------------
+                | Store the currente file selected to be crop and update
+                | ------------------------------------------------------------------------------------
+                * @param {object} instance the current file item instance
+                */
+                $scope.setInstance = function (instance, event) {
+                    $scope.cropImage = '';
+                    $scope.cropImageResult = '';
+                    $scope.cropSize = 600;
+                    IImage = instance;
+                    IImage.element = event;
+
+                    var reader = new FileReader();
+                    reader.onload = function (evt) {
+                        $scope.$apply(function () {
+                            $scope.cropImage = evt.target.result;
+                            var image = new Image();
+                            image.onload = function () {
+                                $scope.cropSize = this.width;
+                            };
+                            image.src = $scope.cropImage;
+                            delete image;
+                        });
+                    };
+                    reader.readAsDataURL(instance._file);
+                };
+
+                /**
+                | ------------------------------------------------------------------------------------
+                | crop and update the image to be upload
+                | ------------------------------------------------------------------------------------
+                */
+                $scope.saveCrop = function () {
+                    var arr = $scope.cropImageResult.split(','),
+                        bstr = atob(arr[1]),
+                        n = bstr.length,
+                        u8arr = new Uint8Array(n);
+
+                    while (n--) {
+                        u8arr[n] = bstr.charCodeAt(n);
+                    }
+                    
+                    var target = IImage.element.target;
+                    var file = new File([u8arr], IImage.file.name, { type: IImage.file.type });
+                    var image = new Image();
+
+                    image.onload = function() {
+                        target.getContext('2d').drawImage(this, 0, 0, target.width, target.height);
+                    };
+                    image.src = $scope.cropImageResult;
+                    
+                    IImage._file = file;
+                    angular.element(document.getElementById('modal-crop')).modal('hide');
+                    delete image;
+                };
+                
+                /*
+                | ------------------------------------------------------------------------------------
+                | Default method, that call the http request for remove the uploaded file
+                | ------------------------------------------------------------------------------------
+                | in the 'data' property of the http response:
+                | success: object with the proprerty 'message'
+                | error: object with the proprerty 'message'
+                */
+                var removeFile = function (arrayFiles, callback) {
+                    $http
+                        .post($scope.removeUrl, { Keys: arrayFiles })
+                        .then(function (reason) {
+                            callback(reason);
+                        }, function (err) {
+                            $scope.messages.danger = err.data.message;
+                        });
                 }
                 /*
                 | ------------------------------------------------------------------------------------
