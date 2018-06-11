@@ -84,7 +84,10 @@
 
             <div class="col-md-2 text-center">
                 <div ng-switch="isImage(uploader.isHTML5, item.file)">
-                    <div ng-switch-when="true" ng-click="setInstance(item,$event)" data-toggle="modal" data-target="#modal-crop" ng-thumb="{ file: item._file, height: 80 }"></div>
+                    <div ng-switch-when="true" class="image-preview" ng-mouseover="hoverCrop = true" ng-mouseleave="hoverCrop = false">
+                        <i class="fa fa-cut" ng-show="hoverCrop"></i>
+                        <div ng-click="setInstance(item,$event)" data-toggle="modal" data-target="#modal-crop" ng-thumb="{file: item._file, height: 80}"></div>
+                    </div>
                     <i ng-switch-when="false" class="glyphicon glyphicon-file"></i>
                 </div>
             </div>
