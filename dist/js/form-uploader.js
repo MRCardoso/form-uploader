@@ -198,6 +198,7 @@ angular.module('form.uploader')
                     } else {
                         $scope.message = errors.join('<br>');
                     }
+                    $scope.$root.$broadcast('form.uploader.added', $scope.fileItem);
                     $scope.$digest();
                 };
 
