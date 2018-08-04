@@ -1,8 +1,9 @@
 angular.module('form.uploader')
-    .directive('formUploader',function(){
+.directive('formUploader',function(){
         return {
             restrict: 'E',
             templateUrl: 'form-uploader.html',
+            require: ['angularFileUpload'],
             scope: {
                 /*
                 | ------------------------------------------------------------------------------------

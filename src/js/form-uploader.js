@@ -10,8 +10,7 @@
             'angularFileUpload',
             'ngThumbCanvas',
             'formCustomChange',
-            'formDragDrop',
-            'simple.upload'
+            'formDragDrop'
         ])
         .run(["$rootScope", function($rootScope){
         }]);

@@ -1,5 +1,5 @@
-angular.module('simple.upload', [])
-    .directive('simpleUpload',function(){
+angular.module('form.uploader')
+    .directive('simpleUploader',function(){
         return {
             restrict: 'E',
             templateUrl: 'uploader-simple.html',

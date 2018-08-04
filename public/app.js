@@ -11,6 +11,9 @@ angular.module("fu", [
             when('/',{
                 templateUrl: '/home.html'
             })
+            .when('/simple', {
+                templateUrl: '/simple.html'
+            })
             .otherwise({
                 redirectTo: '/'
             });

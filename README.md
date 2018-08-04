@@ -26,24 +26,7 @@ Add the dependence in the your module:
 angular.module('app', ['form.uploader'])
 ```
 
-## Simple Example
-
-Html code to add in the view:
-
-```Html
-<form-uploader 
-    send-url="sendUrl" 
-    remove-url="removeUrl" 
-    allow-type="gif">
-</form-uploader>
-```
-
-Script code to add in the Controller:
-
-```javascript
-$scope.sendUrl = "/api/send";
-$scope.removeUrl = "/api/remove";
-```
+# Directives
 
 ## form-uploader
 * **sendUrl:** String, required The url request of send and upload of the file
@@ -62,7 +45,7 @@ $scope.removeUrl = "/api/remove";
     [many="Bool"]
     [allow-type="String"]
     [default-limit="Int"]
-    [validators="Array({name: '', fn: function(item, options){}})"]>
+    [validators="Array({name: String, values: String|Int, type: String|Function, message: String})"]>
 </form-uploader>
 ```
 
@@ -99,6 +82,23 @@ Event when the upload finish
 $rootScope.$on('form.uploader.finish', function(e){
     // put here your method when the upload finish
 });
+```
+
+## simple-uploader
+* **defaultLimit:** Int, (default 3MB) The max size of the file uploaded
+* **fileItem:** ngModel, the scope model to be store the uploaded file
+* **allowType:** String, (default: undefined e.g.:[jpg|gif|png]) The allowed extensions to the upload, by default all extensions are allowed
+* **validators:** Array, (default: []) A list of array with filters for the upload, an array of objects with properties:
+    * **name:** the name of the filter
+    * **fn:** the function with the rule of the filter, has two arguments(item, options)
+
+```Html
+<simple-uploader 
+    [allow-type="String"]
+    [default-limit="Int"]
+    [file-item="ngModel"]
+    [validators="Array({name: String, values: String|Int, type: String|Function, message: String})"]>
+</simple-upload>
 ```
 
 ## Changelog
