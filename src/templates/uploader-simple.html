@@ -2,7 +2,10 @@
     <div class="file-group-item" ng-if="fileItem==null">
         <input type="file" ng-if="!many" id="file" custom-change="onChangeFile" ng-hide="true">
         <div ng-click="openFile()" class="upFile text-center" drag-drop-over="nv-file-over" drag-drop>
-            <div ng-bind-html="renderData()"></div>
+            <ng-transclude>
+                <p>Arrate aqui ou clique para efetuar o upload</p>
+                <i class='fa fa-upload'></i>
+            </ng-transclude>
             <p ng-if="message" ng-bind="message" class="text-warning"></p>
         </div>
     </div>

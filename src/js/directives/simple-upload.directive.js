@@ -3,6 +3,7 @@ angular.module('simple.upload', [])
         return {
             restrict: 'E',
             templateUrl: 'uploader-simple.html',
+            transclude: true,
             scope: {
                 /*
                 | ------------------------------------------------------------------------------------
