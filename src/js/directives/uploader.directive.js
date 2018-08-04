@@ -1,8 +1,23 @@
 angular.module('form.uploader')
+    .directive('customChange', [
+        function () {
+            return {
+                restrict: 'A',
+                link: function (scope, element, attrs, controller) {
+                    var onChangeHandler = scope.$eval(attrs.customChange);
+                    element.bind('change', onChangeHandler);
+                }
+            };
+        }
+    ])
     .directive('formUploader',function(){
         return {
             restrict: 'E',
-            templateUrl: 'form-uploader.html',
+            // templateUrl: 'form-uploader.html',
+            templateUrl: function(element, attrs) {
+                var view = angular.isUndefined(attrs.uploadOnSubmit) ? false : attrs.uploadOnSubmit;
+                return (view ? 'form-uploader-simple.html' : 'form-uploader.html');
+            },
             scope: {
                 /*
                 | ------------------------------------------------------------------------------------
@@ -42,7 +57,8 @@ angular.module('form.uploader')
                 | String, required The url request of send and upload of the file
                 | ------------------------------------------------------------------------------------
                 */
-                sendUrl: '=?sendUrl'
+                sendUrl: '=?sendUrl',
+                uploadOnSubmit: '=?uploadOnSubmit'
             },
             controller: ["$scope", "FileUploader", "$http", "$filter", function($scope, FileUploader, $http, $filter)
             {
@@ -52,6 +68,23 @@ angular.module('form.uploader')
                 }
 
                 var listFile = [];
+                $scope.fileItems = [];
+
+                $scope.onChangeFile = function(event) {
+                    var files = [];
+                    for (var i = 0; i < event.target.files.length; i++) {
+                        var current = event.target.files[i];
+                        files.push({
+                            name: current.name,
+                            size: current.size,
+                            type: current.type,
+                            file: current
+                        });
+                    }
+                    $scope.fileItems = files;
+                    $scope.$digest();
+                    console.log(files);
+                }
                 
                 /*
                 | ------------------------------------------------------------------------------------
@@ -81,6 +114,7 @@ angular.module('form.uploader')
                 $scope.validators = angular.isUndefined($scope.validators) ? [] : $scope.validators;
                 $scope.removeUrl = angular.isUndefined($scope.removeUrl) ? null : $scope.removeUrl;
                 $scope.defaultLimit = angular.isUndefined($scope.defaultLimit) ? (3 * 1024 * 1024) : $scope.defaultLimit;
+                $scope.uploadOnSubmit = angular.isUndefined($scope.uploadOnSubmit) ? false : $scope.uploadOnSubmit;
                 
                 $scope.cleanMessage = function(item)
                 {

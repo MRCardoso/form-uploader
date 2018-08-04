@@ -1,0 +1,60 @@
+
+<div ng-repeat="(type, msg) in messages">
+    <div ng-show="msg" class="alert alert-{{type}} alert-dismissible flash" role="alert">
+        <button type="button" ng-click="cleanMessage(type)" class="close">
+            <span aria-hidden="true">&times;</span>
+        </button>
+        <strong>
+            <i ng-class="{'fa-warning': type=='danger', 'fa-info': type=='info', 'fa-check': type=='success'}" class="fa"></i>
+        </strong>
+        {{msg}}
+    </div>
+</div>
+
+<div class="clear"></div>
+
+<div class="text-center">
+    <input type="file" ng-if="many" multiple id="file" custom-change="onChangeFile" ng-hide="true">
+    <input type="file" ng-if="!many" id="file" custom-change="onChangeFile" ng-hide="true">
+    <div class="upFile" data-id="default" role="button">
+        <div ng-click="openFile()">
+            <div over-class="another-file-over" class="well my-drop-zone">
+                Arrate aqui ou clique para efetuar o upload
+                <i class="fa fa-upload"></i>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div ng-repeat="item in fileItems">
+    <div class="file-group-item">
+        <div class="col-md-3">
+            <button type="button" uib-tooltip="Remover" class="btn btn-danger btn-xs" ng-click="deleteItem(item)">
+                <span class="glyphicon glyphicon-remove"></span>
+            </button>
+        </div>
+
+        <div class="col-md-2 text-center">
+            <div ng-show="isImage(true, item.file)" ng-thumb="{ file: item.file, height: 80 }"></div>
+            <i class="glyphicon glyphicon-file" ng-hide="isImage(true, item.file)"></i>
+        </div>
+        <div class="col-md-4 text-center">
+            <div class="force-text" ng-bind="item.file.name| shortName:17:true" uib-tooltip="{{item.file.name}}"></div>
+        </div>
+        <div class="col-md-1">
+            <span tooltip="Size" tooltip-placement="top" tooltip-trigger="mouseenter" ng-show="true" nowrap>
+                {{ item.file.size/1024/1024|number:2 }} MB
+            </span>
+        </div>
+        <div class="col-md-2">
+            <div ng-show="true">
+                <div class="progress" style="margin-bottom: 0;">
+                    <div class="progress-bar" role="progressbar" ng-style="{ 'width': item.progress + '%' }">
+                        {{item.progress + '%'}}
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="clear"></div>
+    </div>
+</div>

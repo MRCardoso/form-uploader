@@ -62,6 +62,6 @@ app.post('/api/remove', (req, res) => {
 	}
 });
 
-open(`http://localhost:${port}`);
+// open(`http://localhost:${port}`);
 
 app.listen(port, () => console.log(`Server running at http://localhost:${port}`));
