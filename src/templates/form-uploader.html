@@ -14,8 +14,8 @@
     <div class="clear"></div>
 
     <div class="text-center">
-        <input type="file" nv-file-select multiple uploader="uploader" id="file" ng-hide="true">
-        <div ng-show="uploader.isHTML5" class="upFile" data-id="default" role="button">
+        <input type="file" nv-file-select multiple uploader="uploader" id="file-{{elKey}}" ng-hide="true">
+        <div ng-show="uploader.isHTML5" class="{{elKey}}" data-id="default" role="button">
             <div nv-file-drop="" uploader="uploader" ng-click="openFile()">
                 <div nv-file-over="file-over" uploader="uploader" over-class="another-file-over" class="well my-drop-zone">
                     Arrate aqui ou clique para efetuar o upload
@@ -61,7 +61,7 @@
         <div ng-repeat="item in uploader.queue" class="file-group-item">
             <div class="badge pull-left">
                 <span tooltip="Size" tooltip-placement="top" tooltip-trigger="mouseenter" ng-show="uploader.isHTML5" nowrap>
-                    {{ item.file.size/1024/1024|number:2 }} MB
+                    {{ limitToMB(item.file.size) }} MB
                 </span>
             </div>
             <div class="text-right">
@@ -109,43 +109,4 @@
     </div>
 </div>
 
-<!-- Modal -->
-<div class="modal fade" id="modal-crop" tabindex="-1" role="dialog" aria-labelledby="myModalLabel">
-    <div class="modal-dialog" role="document">
-        <div class="modal-content">
-            <div class="modal-header">
-                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
-                    <span aria-hidden="true">&times;</span>
-                </button>
-                <h4 class="modal-title" id="myModalLabel">Cortar imagem</h4>
-            </div>
-            <div class="modal-body">
-                <!-- Nav tabs -->
-                <ul class="nav nav-tabs nav-justified" role="tablist">
-                    <li role="presentation" class="active">
-                        <a role="tab" data-target="#crop" data-toggle="tab">Corte</a>
-                    </li>
-                    <li role="presentation">
-                        <a role="tab" data-target="#preview" data-toggle="tab">Pre-visualização</a>
-                    </li>
-                </ul>
-                <!-- Tab panes -->
-                <div class="tab-content">
-                    <div role="tabpanel" class="tab-pane active" id="crop">
-                        <div class="cropArea">
-                            <img-crop image="cropImage" result-image="cropImageResult" area-type="square" area-min-size="50" result-image-quality="1.0"
-                                result-image-size="cropSize"></img-crop>
-                        </div>
-                    </div>
-                    <div role="tabpanel" class="tab-pane" id="preview">
-                        <img ng-src="{{cropImageResult}}" width="100%" height="350" />
-                    </div>
-                </div>
-            </div>
-            <div class="modal-footer">
-                <button type="button" class="btn btn-default" data-dismiss="modal">Cancelar</button>
-                <button type="button" class="btn btn-primary" ng-click="saveCrop()">Salvar</button>
-            </div>
-        </div>
-    </div>
-</div>
+<div ng-include="'modal-crop.html'"></div>

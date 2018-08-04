@@ -19,10 +19,14 @@
             </form-uploader> -->
 
             <simple-upload 
-                allow-type="png"
-                default-limit="100*1024*1024"
+                allow-type="png|jpg"
+                default-limit="3*1024*1024"
                 upload-template="myHtml"
                 file-item="fileItem">
+                <div class="row">
+                    <img src="./upload.png" width="80">
+                    <p>Arrate aqui ou clique para efetuar o upload</p>
+                </div>
             </simple-upload>
         </div>
     </div>    

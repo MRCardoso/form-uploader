@@ -1,6 +1,9 @@
- .my-drop-zone { border: dotted 3px #5E8FCD; } 
 /* Default class applied to drop zones on over */
-.nv-file-over { border: dotted 3px #6C9E6A; }
+.file-over {
+    border: solid 3px #5E8FCD !important;
+    /* background-color: #FCFCEF !important */
+    background-color: #F1F2F0 !important
+}
 .file-group{
     width: 100%;
     text-align: left;
@@ -8,10 +11,12 @@
     /* border: 1px solid #CFCFCF; */
     margin-bottom: 4px;
     border-radius: 5px;
+    word-wrap: break-word !important;
 }
 
 .file-group-item{
-    width: 209px;
+    position: relative;
+    width: 220px;
     padding: 5px;
     margin-bottom: 5px;
     margin-left: 5px;
@@ -20,6 +25,10 @@
     background: #FFF;
     display: inline-block;
     cursor: pointer;
+    border-radius: 5px;
+}
+.file-group-item img{
+    width: 80%;
 }
 
 .another-file-over{
@@ -75,6 +84,17 @@
 }
 .uploader-simples input[type=file]{
     padding: 8px;
+}
+
+.delete-image{
+    float: right;
+    text-shadow: none;
+    color: #E14e4a !important;
+    padding: 0 !important;
+    font-size: 22px !important;
+    border-radius: 50% !important;
+    cursor: pointer;
+    opacity: 1 !important;
 }
 
 @keyframes loading {

@@ -26,19 +26,24 @@ angular.module('simple.upload', [])
                 | ------------------------------------------------------------------------------------
                 */
                 defaultLimit: '=?defaultLimit',
+                /*
+                | ------------------------------------------------------------------------------------
+                | ng-model, the instance of the client to storage the uploaded file
+                | ------------------------------------------------------------------------------------
+                */
                 fileItem: '=?fileItem',
-                uploadTemplate: '=?uploadTemplate'
             },
-            controller: ["$scope", "$sce", function($scope, $sce)
+            controller: ["$scope", "ImageService", function ($scope, ImageService)
             {
-                var IImage = null;
-
                 $scope.message = null;
                 $scope.validators = angular.isUndefined($scope.validators) ? [] : $scope.validators;
                 $scope.defaultLimit = angular.isUndefined($scope.defaultLimit) ? (3 * 1024 * 1024) : $scope.defaultLimit;
-                $scope.renderData = function() {
-                    return $sce.trustAsHtml($scope.uploadTemplate)
-                }
+                $scope.fileItem = angular.isUndefined($scope.fileItem) ? null : $scope.fileItem;
+                
+                ImageService.setDefaultValidators($scope.allowType, $scope.defaultLimit);
+                
+                var filters = ImageService.getValidators($scope.validators);
+                var el = $scope.elKey = ImageService.getElementKey();
                 /*
                 | ------------------------------------------------------------------------------------
                 | Call the event click in input#file
@@ -47,22 +52,11 @@ angular.module('simple.upload', [])
                 $scope.openFile = function ()
                 {
                     var $el = angular.element;
-                    $el(document).off('click.upFile').on('click.upFile', '.upFile', function ()
+                    $el(document).off('click.'+el).on('click.'+el, '.'+el, function ()
                     {
-                        $el("#file").off('click').trigger('click');
+                        $el("#file-"+el).off('click').trigger('click');
                     });
                 };
-                
-                /*
-                | ------------------------------------------------------------------------------------
-                | Validate the type of file uploaded
-                | ------------------------------------------------------------------------------------
-                */
-                $scope.isImage = function(isHtml5, file){
-                    if( /(gif|jpg|jpeg|png|x-png|pjpeg)/.test(file.type) )
-                        return isHtml5;
-                    return false;
-                }
 
                 /*
                 | ------------------------------------------------------------------------------------
@@ -74,114 +68,41 @@ angular.module('simple.upload', [])
                     $scope.fileItem = null;
                 };
 
-                /**
-                | ------------------------------------------------------------------------------------
-                | Store the currente file selected to be crop and update
-                | ------------------------------------------------------------------------------------
-                * @param {object} instance the current file item instance
-                */
-                $scope.setInstance = function (instance, event) {
-                    $scope.cropImage = '';
-                    $scope.cropImageResult = '';
-                    $scope.cropSize = 600;
-                    IImage = instance;
-                    IImage.element = event;
-
-                    var reader = new FileReader();
-                    reader.onload = function (evt) {
-                        $scope.$apply(function () {
-                            $scope.cropImage = evt.target.result;
-                            var image = new Image();
-                            image.onload = function () {
-                                $scope.cropSize = this.width;
-                            };
-                            image.src = $scope.cropImage;
-                            delete image;
-                        });
-                    };
-                    reader.readAsDataURL(instance.file);
-                };
-
-                /**
-                | ------------------------------------------------------------------------------------
-                | crop and update the image to be upload
-                | ------------------------------------------------------------------------------------
-                */
-                $scope.saveCrop = function () {
-                    var arr = $scope.cropImageResult.split(','),
-                        bstr = atob(arr[1]),
-                        n = bstr.length,
-                        u8arr = new Uint8Array(n);
-
-                    while (n--) {
-                        u8arr[n] = bstr.charCodeAt(n);
-                    }
-                    
-                    var target = IImage.element.target;
-                    var file = new File([u8arr], IImage.file.name, { type: IImage.file.type });
-                    var image = new Image();
-
-                    image.onload = function() {
-                        target.getContext('2d').drawImage(this, 0, 0, target.width, target.height);
-                    };
-                    image.src = $scope.cropImageResult;
-                    
-                    IImage.file = file;
-                    angular.element(document.getElementById('modal-crop')).modal('hide');
-                    delete image;
-                };
-
-                $scope.fileItem = angular.isUndefined($scope.fileItem) ? null : $scope.fileItem;
-                var filters = $scope.validators;
-
                 /*
                 | ------------------------------------------------------------------------------------
-                | Set filter by type of file, when the 'allowType' is declared
+                | Trigger change file event, and refrash the ng-model[fileItem]
                 | ------------------------------------------------------------------------------------
                 */
-                if( !(angular.isUndefined($scope.allowType)) )
-                {
-                    filters.push({
-                        name: 'typeAllow',
-                        fn: function(item /*{File|FileLikeObject}*/, options) {
-                            var regex = new RegExp($scope.allowType, "i");
-                            var validation = regex.test(item.name);
-                            if( !(validation) )
-                                $scope.message = "Extensão inválida, o arquivo deve ser '"+$scope.allowType.replace(/(\|)/ig,", ")+"'";
-                            return validation;
-                        }
-                    });
-                }
-
-                /*
-                | ------------------------------------------------------------------------------------
-                | Set filter for max size of the file uploaded
-                | ------------------------------------------------------------------------------------
-                */
-                filters.push({
-                    name: 'sizeAllow',
-                    fn: function(item /*{File|FileLikeObject}*/, options) {
-                        var validation = item.size > $scope.defaultLimit;
-                        if( validation )
-                            $scope.message = "O arquivo excedeu o tamanho máximo permitido "+$filter('number')($scope.defaultLimit,2)+"MB";
-
-                        return !validation;
-                    }
-                });
-
                 $scope.onChangeFile = function (event) {
                     var data = event.target.files[0];
                     var errors = filters.map(function (r) {
-                        return r.fn(data, {});
+                        return (r.fn(data) ? null : ImageService.getError(r.name));
                     }).filter(function (r) {
-                        return r == false;
+                        return r != null;
                     });
 
-                    console.log(errors);
                     if (errors.length == 0) {
-                        $scope.fileItem = { file: data };
+                        $scope.fileItem = { file: data, _file: data };
+                    } else {
+                        $scope.message = errors.join('<br>');
                     }
                     $scope.$digest();
+                };
+
+                $scope.limitToMB = function (value) {
+                    return ImageService.limitToMB(value);
+                };
+
+                $scope.isImage = function (isHtml5, file) {
+                    return ImageService.isImage(isHtml5, file.type);
+                };
+
+                $scope.setInstance = function (instance, event) {
+                    ImageService.setCrop($scope, instance, event);
+                };
+
+                $scope.saveCrop = function () {
+                    ImageService.saveCrop($scope);
                 };
             }]
         }
