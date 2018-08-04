@@ -9,6 +9,8 @@ Add third party dependencies
 
 ```Html
 <script language="Javascript" src="./bower_components/angular-file-upload/dist/angular-file-upload.min.js"></script>
+<link rel="stylesheet" type="text/css" href="./bower_components/ng-img-crop/compile/minified/ng-img-crop.css.css">
+<script language="Javascript" src="./bower_components/ng-img-crop/compile/minified/ng-img-crop.css.js"></script>
 ```
 
 Add the css and javascript files

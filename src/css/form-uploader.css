@@ -1,11 +1,24 @@
  .my-drop-zone { border: dotted 3px #5E8FCD; } 
 /* Default class applied to drop zones on over */
 /* .nv-file-over { border: dotted 3px #6C9E6A; } */
-.file-group-item{
+.file-group{
     width: 100%;
+    text-align: left;
     padding: 5px;
+    /* border: 1px solid #CFCFCF; */
+    margin-bottom: 4px;
+    border-radius: 5px;
+}
+
+.file-group-item{
+    width: 209px;
+    padding: 5px;
+    margin-bottom: 5px;
+    margin-left: 5px;
+    margin-right: 5px;
     border: 1px solid #CFCFCF;
     background: #FFF;
+    display: inline-block;
 }
 
 .another-file-over{
@@ -14,14 +27,15 @@
 .file-over{
     border: 3px solid #5E8FCD;
 }
-canvas {
+.form-uploader-container canvas {
     background-color: #f3f3f3;
-    -webkit-box-shadow: 3px 3px 3px 0 #e3e3e3;
-    -moz-box-shadow: 3px 3px 3px 0 #e3e3e3;
-    box-shadow: 3px 3px 3px 0 #e3e3e3;
     border: 1px solid #c3c3c3;
+    /* -webkit-box-shadow: 3px 3px 3px 0 #e3e3e3;
+    -moz-box-shadow: 3px 3px 3px 0 #e3e3e3;
+    box-shadow: 3px 3px 3px 0 #e3e3e3; */
+    width: 100%;
     height: 100px;
-    margin: 6px 0 0 6px;
+    /* margin: 6px 0 0 6px; */
 }
 .thumbnail{
     margin-bottom: 0;
@@ -34,6 +48,29 @@ canvas {
     animation-iteration-count: infinite;
     animation-timing-function: linear;
     animation-name: loading;
+}
+
+.cropArea {
+  background: #E4E4E4;
+  overflow: hidden;
+  width:100%;
+  height:350px;
+}
+
+.image-preview{
+    position: relative;
+}
+.image-preview:hover{
+    opacity: 0.8;
+}
+.image-preview i{
+    position: absolute;
+    background: #EFEFEF;
+    border-radius: 5px;
+    opacity: 0.5;
+    padding: 4%;
+    top: 5%;
+    left: 2%;
 }
 
 @keyframes loading {

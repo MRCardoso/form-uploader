@@ -1,5 +1,4 @@
-<div ng-if="uploader">
-    
+<div ng-if="uploader" class="form-uploader-container">
     <div ng-repeat="(type, msg) in messages">
         <div ng-show="msg" class="alert alert-{{type}} alert-dismissible flash" role="alert">
             <button type="button" ng-click="cleanMessage(type)" class="close">
@@ -27,8 +26,8 @@
     </div>
 
     <div ng-show="uploader.queue.length>1">
-        <div class="file-group-item">
-            <div class="col-md-3">
+        <div class="file-group">
+            <div class="col-md-4">
                 <button type="button" class="btn btn-success btn-xs" ng-click="uploader.uploadAll()" ng-disabled="!uploader.getNotUploadedItems().length"
                         uib-tooltip="Enviar tudo" uib-tooltip-placement="top" uib-tooltip-trigger="mouseenter">
                     <span class="glyphicon glyphicon-upload"></span>
@@ -41,11 +40,12 @@
                         uib-tooltip="Remover tudo" uib-tooltip-placement="top" uib-tooltip-trigger="mouseenter">
                     <span class="glyphicon glyphicon-remove"></span>
                 </button>
+
+                <div class="badge pull-right">
+                    Total de arquivos: {{uploader.queue.length}}
+                </div>
             </div>
-            <div class="col-md-2 text-center">
-                <span class="badge" ng-bind="uploader.queue.length"></span>
-            </div>
-            <div class="col-md-7">
+            <div class="col-md-8">
                 <div ng-show="uploader.isHTML5">
                     <div class="progress" style="margin-bottom: 0;">
                         <div class="progress-bar" role="progressbar" ng-style="{ 'width': uploader.progress + '%' }">{{ uploader.progress + '%'}}</div>
@@ -57,9 +57,14 @@
         </div>
     </div>
 
-    <div ng-repeat="item in uploader.queue">
-        <div class="file-group-item">
-            <div class="col-md-3">
+    <div class="file-group" ng-show="uploader.queue.length>0">
+        <div ng-repeat="item in uploader.queue" class="file-group-item">
+            <div class="badge pull-left">
+                <span tooltip="Size" tooltip-placement="top" tooltip-trigger="mouseenter" ng-show="uploader.isHTML5" nowrap>
+                    {{ item.file.size/1024/1024|number:2 }} MB
+                </span>
+            </div>
+            <div class="text-right">
                 <button type="button" class="btn btn-success btn-xs" uib-tooltip="Enviar" ng-click="item.upload()" ng-disabled="item.isReady || item.isUploading || item.isSuccess">
                     <span class="glyphicon glyphicon-upload"></span>
                 </button>
@@ -83,28 +88,64 @@
                 </span>
             </div>
 
-            <div class="col-md-2 text-center">
-                <div ng-show="isImage(uploader.isHTML5, item.file)" ng-thumb="{ file: item._file, height: 80 }"></div>
-                <i class="glyphicon glyphicon-file" ng-hide="isImage(uploader.isHTML5, item.file)"></i>
-            </div>
-            <div class="col-md-4 text-center">
-                <div class="force-text" ng-bind="item.file.name| shortName:17:true" uib-tooltip="{{item.file.name}}"></div>
-            </div>
-            <div class="col-md-1">
-                <span tooltip="Size" tooltip-placement="top" tooltip-trigger="mouseenter" ng-show="uploader.isHTML5" nowrap>
-                    {{ item.file.size/1024/1024|number:2 }} MB
-                </span>
-            </div>
-            <div class="col-md-2">
-                <div ng-show="uploader.isHTML5">
-                    <div class="progress" style="margin-bottom: 0;">
-                        <div class="progress-bar" role="progressbar" ng-style="{ 'width': item.progress + '%' }">
-                            {{item.progress + '%'}}
+            <div class="text-center" uib-tooltip="{{item.file.name}}">
+                <div ng-switch="isImage(uploader.isHTML5, item.file)">
+                    <div ng-switch-when="true" class="image-preview" ng-mouseover="hoverCrop = true" ng-mouseleave="hoverCrop = false">
+                        <i class="fa fa-cut" ng-show="hoverCrop"></i>
+                        <div ng-click="setInstance(item,$event)" data-toggle="modal" data-target="#modal-crop" ng-thumb="{file: item._file, height: 80}"></div>
+                    </div>
+                    <i ng-switch-when="false" class="glyphicon glyphicon-file"></i>
+                    
+                    <div ng-show="uploader.isHTML5">
+                        <div class="progress" style="margin-bottom: 0;">
+                            <div class="progress-bar" role="progressbar" ng-style="{ 'width': item.progress + '%' }">
+                                {{item.progress + '%'}}
+                            </div>
                         </div>
                     </div>
                 </div>
             </div>
-            <div class="clear"></div>
+        </div>
+    </div>
+</div>
+
+<!-- Modal -->
+<div class="modal fade" id="modal-crop" tabindex="-1" role="dialog" aria-labelledby="myModalLabel">
+    <div class="modal-dialog" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+                <h4 class="modal-title" id="myModalLabel">Cortar imagem</h4>
+            </div>
+            <div class="modal-body">
+                <!-- Nav tabs -->
+                <ul class="nav nav-tabs nav-justified" role="tablist">
+                    <li role="presentation" class="active">
+                        <a role="tab" data-target="#crop" data-toggle="tab">Corte</a>
+                    </li>
+                    <li role="presentation">
+                        <a role="tab" data-target="#preview" data-toggle="tab">Pre-visualização</a>
+                    </li>
+                </ul>
+                <!-- Tab panes -->
+                <div class="tab-content">
+                    <div role="tabpanel" class="tab-pane active" id="crop">
+                        <div class="cropArea">
+                            <img-crop image="cropImage" result-image="cropImageResult" area-type="square" area-min-size="50" result-image-quality="1.0"
+                                result-image-size="cropSize"></img-crop>
+                        </div>
+                    </div>
+                    <div role="tabpanel" class="tab-pane" id="preview">
+                        <img ng-src="{{cropImageResult}}" width="100%" height="350" />
+                    </div>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-default" data-dismiss="modal">Cancelar</button>
+                <button type="button" class="btn btn-primary" ng-click="saveCrop()">Salvar</button>
+            </div>
         </div>
     </div>
 </div>

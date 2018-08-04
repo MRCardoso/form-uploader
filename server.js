@@ -52,7 +52,7 @@ app.post('/api/remove', (req, res) => {
 		var fs = require('fs');
 		req.body.Keys.map(row=>{
 			if (fs.existsSync(row)) {
-				fs.unlink(row);
+				fs.unlink(row,err =>{});
 			}			
 		});
 		res.json({message: 'sucesso ao remover arquivo'});
@@ -62,6 +62,6 @@ app.post('/api/remove', (req, res) => {
 	}
 });
 
-open(`http://localhost:${port}`);
+// open(`http://localhost:${port}`);
 
 app.listen(port, () => console.log(`Server running at http://localhost:${port}`));
