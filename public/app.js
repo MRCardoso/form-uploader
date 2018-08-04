@@ -3,6 +3,7 @@ angular.module("fu", [
         'ngRoute',
         'ngResource',
         'form.uploader',
+        'ngImgCrop',
         'app.controller'
     ])
     .config(['$routeProvider', function($routeProvider){
