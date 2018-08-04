@@ -1,23 +1,8 @@
 angular.module('form.uploader')
-    .directive('customChange', [
-        function () {
-            return {
-                restrict: 'A',
-                link: function (scope, element, attrs, controller) {
-                    var onChangeHandler = scope.$eval(attrs.customChange);
-                    element.bind('change', onChangeHandler);
-                }
-            };
-        }
-    ])
     .directive('formUploader',function(){
         return {
             restrict: 'E',
-            // templateUrl: 'form-uploader.html',
-            templateUrl: function(element, attrs) {
-                var view = angular.isUndefined(attrs.uploadOnSubmit) ? false : attrs.uploadOnSubmit;
-                return (view ? 'form-uploader-simple.html' : 'form-uploader.html');
-            },
+            templateUrl: 'form-uploader.html',
             scope: {
                 /*
                 | ------------------------------------------------------------------------------------
@@ -57,47 +42,21 @@ angular.module('form.uploader')
                 | String, required The url request of send and upload of the file
                 | ------------------------------------------------------------------------------------
                 */
-                sendUrl: '=?sendUrl',
-                uploadOnSubmit: '=?uploadOnSubmit'
+                sendUrl: '=?sendUrl'
             },
             controller: ["$scope", "FileUploader", "$http", "$filter", function($scope, FileUploader, $http, $filter)
             {
-                if( angular.isUndefined($scope.sendUrl) )
-                {
+                if (angular.isUndefined($scope.sendUrl)) {
                     return console.warn("Por Favor, Defina uma 'url' para este upload");
                 }
-
                 var listFile = [];
-                $scope.fileItems = [];
-
-                $scope.onChangeFile = function(event) {
-                    var files = [];
-                    for (var i = 0; i < event.target.files.length; i++) {
-                        var current = event.target.files[i];
-                        files.push({
-                            name: current.name,
-                            size: current.size,
-                            type: current.type,
-                            file: current
-                        });
-                    }
-                    $scope.fileItems = files;
-                    $scope.$digest();
-                    console.log(files);
-                }
                 var IImage = null;
-                /*
-                | ------------------------------------------------------------------------------------
-                | Default labels with the messages, for success, info or error in upload
-                | ------------------------------------------------------------------------------------
-                */
+
                 $scope.messages = {danger: null, success: null, info: null};
-                
                 $scope.many = angular.isUndefined($scope.many) ? false : $scope.many;
                 $scope.validators = angular.isUndefined($scope.validators) ? [] : $scope.validators;
                 $scope.removeUrl = angular.isUndefined($scope.removeUrl) ? null : $scope.removeUrl;
                 $scope.defaultLimit = angular.isUndefined($scope.defaultLimit) ? (3 * 1024 * 1024) : $scope.defaultLimit;
-                $scope.uploadOnSubmit = angular.isUndefined($scope.uploadOnSubmit) ? false : $scope.uploadOnSubmit;
                 
                 $scope.cleanMessage = function(item)
                 {
@@ -136,7 +95,7 @@ angular.module('form.uploader')
                 */
                 $scope.deleteItem = function(item)
                 {
-                    if( 'uploadedPath' in item && $scope.removeUrl != null )
+                    if( !$scope.uploadOnSubmit && 'uploadedPath' in item && $scope.removeUrl != null )
                     {
                         item.showLoading = true;                        
                         removeFile([item.uploadedPath], function(reason){
@@ -246,16 +205,6 @@ angular.module('form.uploader')
                             $scope.messages.danger = err.data.message;
                         });
                 }
-                /*
-                | ------------------------------------------------------------------------------------
-                | upload images by ajax with FileUploader
-                | ------------------------------------------------------------------------------------
-                */
-                var uploader = $scope.uploader = new FileUploader({
-                    url: $scope.sendUrl,
-                    queueLimit: $scope.defaultLimit
-                });
-
                 var filters = $scope.validators;
 
                 /*
@@ -293,6 +242,15 @@ angular.module('form.uploader')
                     }
                 });
 
+                /*
+                | ------------------------------------------------------------------------------------
+                | upload images by ajax with FileUploader
+                | ------------------------------------------------------------------------------------
+                */
+                var uploader = $scope.uploader = new FileUploader({
+                    url: $scope.sendUrl,
+                    queueLimit: $scope.defaultLimit
+                });
                 uploader.filters = filters;
 
                 /*

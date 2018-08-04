@@ -1,36 +1,15 @@
-
-<div ng-repeat="(type, msg) in messages">
-    <div ng-show="msg" class="alert alert-{{type}} alert-dismissible flash" role="alert">
-        <button type="button" ng-click="cleanMessage(type)" class="close">
-            <span aria-hidden="true">&times;</span>
-        </button>
-        <strong>
-            <i ng-class="{'fa-warning': type=='danger', 'fa-info': type=='info', 'fa-check': type=='success'}" class="fa"></i>
-        </strong>
-        {{msg}}
-    </div>
-</div>
-
-<div class="clear"></div>
-
-<div class="text-center">
-    <input type="file" ng-if="many" multiple id="file" custom-change="onChangeFile" ng-hide="true">
-    <input type="file" ng-if="!many" id="file" custom-change="onChangeFile" ng-hide="true">
-    <div class="upFile" data-id="default" role="button">
-        <div ng-click="openFile()">
-            <div over-class="another-file-over" drag-drop-over="nv-file-over" drag-drop class="well my-drop-zone">
-                Arrate aqui ou clique para efetuar o upload
-                <i class="fa fa-upload"></i>
-            </div>
+<div class="file-group">
+    <div class="file-group-item" ng-if="fileItem==null">
+        <input type="file" ng-if="!many" id="file" custom-change="onChangeFile" ng-hide="true">
+        <div ng-click="openFile()" class="upFile text-center" drag-drop-over="nv-file-over" drag-drop>
+            <div ng-bind-html="renderData()"></div>
+            <p ng-if="message" ng-bind="message" class="text-warning"></p>
         </div>
     </div>
-</div>
-
-<div class="file-group" ng-show="fileItems.length>0">
-    <div ng-repeat="item in fileItems" class="file-group-item">
+    <div class="file-group-item" ng-if="fileItem!=null">
         <div class="badge pull-left">
             <span tooltip="Size" tooltip-placement="top" tooltip-trigger="mouseenter" nowrap>
-                {{ item.file.size/1024/1024|number:2 }} MB
+                {{ fileItem.file.size/1024/1024|number:2 }} MB
             </span>
         </div>
         <div class="text-right">
@@ -39,21 +18,13 @@
             </button>
         </div>
 
-        <div class="text-center" uib-tooltip="{{item.file.name}}">
-            <div ng-switch="isImage(true, item.file)">
+        <div class="text-center" uib-tooltip="{{fileItem.file.name}}">
+            <div ng-switch="isImage(true, fileItem.file)">
                 <div ng-switch-when="true" class="image-preview" ng-mouseover="hoverCrop = true" ng-mouseleave="hoverCrop = false">
                     <i class="fa fa-cut" ng-show="hoverCrop"></i>
-                    <div ng-click="setInstance(item, $event)" data-toggle="modal" data-target="#modal-crop" ng-thumb="{file: item.file, height: 80}"></div>
+                    <div ng-click="setInstance(item, $event)" data-toggle="modal" data-target="#modal-crop" ng-thumb="{file: fileItem.file, height: 80}"></div>
                 </div>
                 <i ng-switch-when="false" class="glyphicon glyphicon-file"></i>
-
-                <div ng-show="true">
-                    <div class="progress" style="margin-bottom: 0;">
-                        <div class="progress-bar" role="progressbar" ng-style="{ 'width': item.progress + '%' }">
-                            {{item.progress + '%'}}
-                        </div>
-                    </div>
-                </div>
             </div>
         </div>
     </div>

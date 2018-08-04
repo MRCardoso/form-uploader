@@ -8,7 +8,10 @@
     angular
         .module('form.uploader',[
             'angularFileUpload',
-            'ngThumbCanvas'
+            'ngThumbCanvas',
+            'formCustomChange',
+            'formDragDrop',
+            'simple.upload'
         ])
         .run(["$rootScope", function($rootScope){
         }]);

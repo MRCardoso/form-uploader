@@ -1,6 +1,6 @@
  .my-drop-zone { border: dotted 3px #5E8FCD; } 
 /* Default class applied to drop zones on over */
-/* .nv-file-over { border: dotted 3px #6C9E6A; } */
+.nv-file-over { border: dotted 3px #6C9E6A; }
 .file-group{
     width: 100%;
     text-align: left;
@@ -19,6 +19,7 @@
     border: 1px solid #CFCFCF;
     background: #FFF;
     display: inline-block;
+    cursor: pointer;
 }
 
 .another-file-over{
@@ -71,6 +72,9 @@
     padding: 4%;
     top: 5%;
     left: 2%;
+}
+.uploader-simples input[type=file]{
+    padding: 8px;
 }
 
 @keyframes loading {
