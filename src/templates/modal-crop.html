@@ -1,0 +1,40 @@
+<!-- Modal -->
+<div class="modal fade" id="modal-crop" tabindex="-1" role="dialog" aria-labelledby="myModalLabel">
+    <div class="modal-dialog" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+                <h4 class="modal-title" id="myModalLabel">Cortar imagem</h4>
+            </div>
+            <div class="modal-body">
+                <!-- Nav tabs -->
+                <ul class="nav nav-tabs nav-justified" role="tablist">
+                    <li role="presentation" class="active">
+                        <a role="tab" data-target="#crop" data-toggle="tab">Corte</a>
+                    </li>
+                    <li role="presentation">
+                        <a role="tab" data-target="#preview" data-toggle="tab">Pre-visualização</a>
+                    </li>
+                </ul>
+                <!-- Tab panes -->
+                <div class="tab-content">
+                    <div role="tabpanel" class="tab-pane active" id="crop">
+                        <div class="cropArea">
+                            <img-crop image="cropImage" result-image="$parent.cropImageResult" area-type="square" area-min-size="50" result-image-quality="1.0"
+                                result-image-size="cropSize"></img-crop>
+                        </div>
+                    </div>
+                    <div role="tabpanel" class="tab-pane" id="preview">
+                        <img ng-src="{{$parent.cropImageResult}}" width="100%" height="350" />
+                    </div>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-default" data-dismiss="modal">Cancelar</button>
+                <button type="button" class="btn btn-primary" ng-click="saveCrop()">Salvar</button>
+            </div>
+        </div>
+    </div>
+</div>

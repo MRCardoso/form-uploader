@@ -1,8 +1,10 @@
 angular.module('form.uploader')
-    .directive('formUploader',function(){
+.directive('formUploader',function(){
         return {
             restrict: 'E',
             templateUrl: 'form-uploader.html',
+            require: ['angularFileUpload'],
+            transclude: true,
             scope: {
                 /*
                 | ------------------------------------------------------------------------------------
@@ -44,32 +46,25 @@ angular.module('form.uploader')
                 */
                 sendUrl: '=?sendUrl'
             },
-            controller: ["$scope", "FileUploader", "$http", "$filter", function($scope, FileUploader, $http, $filter)
+            controller: ["$scope", "FileUploader", "$http", "$filter", "ImageService", function ($scope, FileUploader, $http, $filter, ImageService)
             {
-                if( angular.isUndefined($scope.sendUrl) )
-                {
+                if (angular.isUndefined($scope.sendUrl)) {
                     return console.warn("Por Favor, Defina uma 'url' para este upload");
                 }
-
                 var listFile = [];
-                var IImage = null;
-                /*
-                | ------------------------------------------------------------------------------------
-                | Default labels with the messages, for success, info or error in upload
-                | ------------------------------------------------------------------------------------
-                */
-                $scope.messages = {danger: null, success: null, info: null};
-                
+
+                $scope.errors = null;
+                $scope.success = null;
                 $scope.many = angular.isUndefined($scope.many) ? false : $scope.many;
                 $scope.validators = angular.isUndefined($scope.validators) ? [] : $scope.validators;
                 $scope.removeUrl = angular.isUndefined($scope.removeUrl) ? null : $scope.removeUrl;
                 $scope.defaultLimit = angular.isUndefined($scope.defaultLimit) ? (3 * 1024 * 1024) : $scope.defaultLimit;
+                var el = $scope.elKey = ImageService.getElementKey();
                 
-                $scope.cleanMessage = function(item)
-                {
-                    $scope.messages[item] = null;
+                $scope.cleanMessage = function(item,event) {
+                    event.stopPropagation();
+                    $scope[item] = null;
                 };
-
                 /*
                 | ------------------------------------------------------------------------------------
                 | Call the event click in input#file
@@ -78,23 +73,12 @@ angular.module('form.uploader')
                 $scope.openFile = function ()
                 {
                     var $el = angular.element;
-                    $el(document).off('click.upFile').on('click.upFile', '.upFile', function ()
+                    $el(document).off('click.'+el).on('click.'+el, '.'+el, function ()
                     {
-                        $el("#file").off('click').trigger('click');
+                        $el("#file-"+el).off('click').trigger('click');
                     });
                 };
                 
-                /*
-                | ------------------------------------------------------------------------------------
-                | Validate the type of file uploaded
-                | ------------------------------------------------------------------------------------
-                */
-                $scope.isImage = function(isHtml5, file){
-                    if( /(gif|jpg|jpeg|png|x-png|pjpeg)/.test(file.type) )
-                        return isHtml5;
-                    return false;
-                }
-
                 /*
                 | ------------------------------------------------------------------------------------
                 | Delete one currently file uploaded
@@ -102,12 +86,12 @@ angular.module('form.uploader')
                 */
                 $scope.deleteItem = function(item)
                 {
-                    if( 'uploadedPath' in item && $scope.removeUrl != null )
+                    if( !$scope.uploadOnSubmit && 'uploadedPath' in item && $scope.removeUrl != null )
                     {
                         item.showLoading = true;                        
                         removeFile([item.uploadedPath], function(reason){
                             item.showLoading = false;
-                            $scope.messages.success = reason.data.message;
+                            $scope.success = reason.data.message;
                             item.remove();
                         });
                     }
@@ -128,7 +112,7 @@ angular.module('form.uploader')
                     {
                         removeFile(listFile, function(reason){
                             listFile = [];
-                            $scope.messages.success = reason.data.message;
+                            $scope.success = reason.data.message;
                             uploader.clearQueue();
                         });
                     }
@@ -138,61 +122,20 @@ angular.module('form.uploader')
                     }
                 };
 
-                /**
-                | ------------------------------------------------------------------------------------
-                | Store the currente file selected to be crop and update
-                | ------------------------------------------------------------------------------------
-                * @param {object} instance the current file item instance
-                */
-                $scope.setInstance = function (instance, event) {
-                    $scope.cropImage = '';
-                    $scope.cropImageResult = '';
-                    $scope.cropSize = 600;
-                    IImage = instance;
-                    IImage.element = event;
-
-                    var reader = new FileReader();
-                    reader.onload = function (evt) {
-                        $scope.$apply(function () {
-                            $scope.cropImage = evt.target.result;
-                            var image = new Image();
-                            image.onload = function () {
-                                $scope.cropSize = this.width;
-                            };
-                            image.src = $scope.cropImage;
-                            delete image;
-                        });
-                    };
-                    reader.readAsDataURL(instance._file);
+                $scope.isImage = function (isHtml5, file) {
+                    return ImageService.isImage(isHtml5, file.type);
                 };
 
-                /**
-                | ------------------------------------------------------------------------------------
-                | crop and update the image to be upload
-                | ------------------------------------------------------------------------------------
-                */
+                $scope.limitToMB = function (value) {
+                    return ImageService.limitToMB(value);
+                };
+
+                $scope.setInstance = function (instance, event) {
+                    ImageService.setCrop($scope, instance, event);
+                };
+
                 $scope.saveCrop = function () {
-                    var arr = $scope.cropImageResult.split(','),
-                        bstr = atob(arr[1]),
-                        n = bstr.length,
-                        u8arr = new Uint8Array(n);
-
-                    while (n--) {
-                        u8arr[n] = bstr.charCodeAt(n);
-                    }
-                    
-                    var target = IImage.element.target;
-                    var file = new File([u8arr], IImage.file.name, { type: IImage.file.type });
-                    var image = new Image();
-
-                    image.onload = function() {
-                        target.getContext('2d').drawImage(this, 0, 0, target.width, target.height);
-                    };
-                    image.src = $scope.cropImageResult;
-                    
-                    IImage._file = file;
-                    angular.element(document.getElementById('modal-crop')).modal('hide');
-                    delete image;
+                    ImageService.saveCrop($scope);
                 };
                 
                 /*
@@ -209,9 +152,10 @@ angular.module('form.uploader')
                         .then(function (reason) {
                             callback(reason);
                         }, function (err) {
-                            $scope.messages.danger = err.data.message;
+                            $scope.errors = err.data.message;
                         });
                 }
+                
                 /*
                 | ------------------------------------------------------------------------------------
                 | upload images by ajax with FileUploader
@@ -221,45 +165,8 @@ angular.module('form.uploader')
                     url: $scope.sendUrl,
                     queueLimit: $scope.defaultLimit
                 });
-
-                var filters = $scope.validators;
-
-                /*
-                | ------------------------------------------------------------------------------------
-                | Set filter by type of file, when the 'allowType' is declared
-                | ------------------------------------------------------------------------------------
-                */
-                if( !(angular.isUndefined($scope.allowType)) )
-                {
-                    filters.push({
-                        name: 'typeAllow',
-                        fn: function(item /*{File|FileLikeObject}*/, options) {
-                            var regex = new RegExp($scope.allowType, "i");
-                            var validation = regex.test(item.name);
-                            if( !(validation) )
-                                $scope.messages.info = "Extensão inválida, o arquivo deve ser '"+$scope.allowType.replace(/(\|)/ig,", ")+"'";
-                            return validation;
-                        }
-                    });
-                }
-
-                /*
-                | ------------------------------------------------------------------------------------
-                | Set filter for max size of the file uploaded
-                | ------------------------------------------------------------------------------------
-                */
-                filters.push({
-                    name: 'sizeAllow',
-                    fn: function(item /*{File|FileLikeObject}*/, options) {
-                        var validation = item.size > $scope.defaultLimit;
-                        if( validation )
-                            $scope.messages.info = "O arquivo excedeu o tamanho máximo permitido "+$filter('number')($scope.defaultLimit,2)+"MB";
-
-                        return !validation;
-                    }
-                });
-
-                uploader.filters = filters;
+                ImageService.setDefaultValidators($scope.allowType, $scope.defaultLimit);
+                uploader.filters = ImageService.getValidators($scope.validators);
 
                 /*
                 | ------------------------------------------------------------------------------------
@@ -281,9 +188,11 @@ angular.module('form.uploader')
                     item.showLoading = true;
                     $scope.$root.$broadcast('form.uploader.begin');
                 };
-                uploader.onCancelItem = function (fileItem, response, status, headers)
-                {
-                    $scope.messages.info = "Envio abortado com sucess!";                   
+                uploader.onWhenAddingFileFailed = function (item, filter, options) {
+                    $scope.errors = ImageService.getError(filter.name);
+                };
+                uploader.onCancelItem = function (fileItem, response, status, headers){
+                    $scope.errors = "Envio abortado com sucess!";                   
                 };
                 /*
                 | ------------------------------------------------------------------------------------
@@ -305,11 +214,11 @@ angular.module('form.uploader')
                         {
                             fileItem.uploadedPath = response.path;
                             listFile.push(response.path);
-                            $scope.messages.success = response.message;
+                            $scope.success = response.message;
                         }
                         else
                         {
-                            $scope.messages.danger = response.message;
+                            $scope.errors = response.message;
                         }
                     }
                     $scope.$root.$broadcast('form.uploader.finish', response);

@@ -26,24 +26,7 @@ Add the dependence in the your module:
 angular.module('app', ['form.uploader'])
 ```
 
-## Simple Example
-
-Html code to add in the view:
-
-```Html
-<form-uploader 
-    send-url="sendUrl" 
-    remove-url="removeUrl" 
-    allow-type="gif">
-</form-uploader>
-```
-
-Script code to add in the Controller:
-
-```javascript
-$scope.sendUrl = "/api/send";
-$scope.removeUrl = "/api/remove";
-```
+# Directives
 
 ## form-uploader
 * **sendUrl:** String, required The url request of send and upload of the file
@@ -62,7 +45,7 @@ $scope.removeUrl = "/api/remove";
     [many="Bool"]
     [allow-type="String"]
     [default-limit="Int"]
-    [validators="Array({name: '', fn: function(item, options){}})"]>
+    [validators="Array({name: String, values: String|Int, type: String|Function, message: String})"]>
 </form-uploader>
 ```
 

@@ -9,7 +9,6 @@ angular.module('ngThumbCanvas',[])
      * @version: 0.1.2, 2014-01-09
      */
     .directive('ngThumb', ['$window', function($window) {
-        console.log('bennngn');
         var helper = {
             support: !!($window.FileReader && $window.CanvasRenderingContext2D),
             isFile: function(item) {

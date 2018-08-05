@@ -8,12 +8,15 @@
     angular
         .module('form.uploader',[
             'angularFileUpload',
-            'ngThumbCanvas'
+            'ngThumbCanvas',
+            'formCustomChange',
+            'formDragDrop'
         ])
         .run(["$rootScope", function($rootScope){
         }]);
 }());
-angular.module('form.uploader').run(['$templateCache', function($templateCache) {$templateCache.put('form-uploader.html','<div ng-if="uploader" class="form-uploader-container">\n    <div ng-repeat="(type, msg) in messages">\n        <div ng-show="msg" class="alert alert-{{type}} alert-dismissible flash" role="alert">\n            <button type="button" ng-click="cleanMessage(type)" class="close">\n                <span aria-hidden="true">&times;</span>\n            </button>\n            <strong>\n                <i ng-class="{\'fa-warning\': type==\'danger\', \'fa-info\': type==\'info\', \'fa-check\': type==\'success\'}" class="fa"></i>\n            </strong>\n            {{msg}}\n        </div>\n    </div>\n\n    <div class="clear"></div>\n\n    <div class="text-center">\n        <input type="file" nv-file-select multiple uploader="uploader" id="file" ng-hide="true">\n        <div ng-show="uploader.isHTML5" class="upFile" data-id="default" role="button">\n            <div nv-file-drop="" uploader="uploader" ng-click="openFile()">\n                <div nv-file-over="file-over" uploader="uploader" over-class="another-file-over" class="well my-drop-zone">\n                    Arrate aqui ou clique para efetuar o upload\n                    <i class="fa fa-upload"></i>\n                </div>\n            </div>\n        </div>\n    </div>\n\n    <div ng-show="uploader.queue.length>1">\n        <div class="file-group">\n            <div class="col-md-4">\n                <button type="button" class="btn btn-success btn-xs" ng-click="uploader.uploadAll()" ng-disabled="!uploader.getNotUploadedItems().length"\n                        uib-tooltip="Enviar tudo" uib-tooltip-placement="top" uib-tooltip-trigger="mouseenter">\n                    <span class="glyphicon glyphicon-upload"></span>\n                </button>\n                <button type="button" class="btn btn-warning btn-xs" ng-click="uploader.cancelAll()" ng-disabled="!uploader.isUploading"\n                        uib-tooltip="Cancelar tudo" uib-tooltip-placement="top" uib-tooltip-trigger="mouseenter">\n                    <span class="glyphicon glyphicon-ban-circle"></span>\n                </button>\n                <button type="button" class="btn btn-danger btn-xs" ng-click="deleteAll(uploader)" ng-disabled="!uploader.queue.length"\n                        uib-tooltip="Remover tudo" uib-tooltip-placement="top" uib-tooltip-trigger="mouseenter">\n                    <span class="glyphicon glyphicon-remove"></span>\n                </button>\n\n                <div class="badge pull-right">\n                    Total de arquivos: {{uploader.queue.length}}\n                </div>\n            </div>\n            <div class="col-md-8">\n                <div ng-show="uploader.isHTML5">\n                    <div class="progress" style="margin-bottom: 0;">\n                        <div class="progress-bar" role="progressbar" ng-style="{ \'width\': uploader.progress + \'%\' }">{{ uploader.progress + \'%\'}}</div>\n                    </div>\n                </div>\n            </div>\n\n            <div class="clear"></div>\n        </div>\n    </div>\n\n    <div class="file-group" ng-show="uploader.queue.length>0">\n        <div ng-repeat="item in uploader.queue" class="file-group-item">\n            <div class="badge pull-left">\n                <span tooltip="Size" tooltip-placement="top" tooltip-trigger="mouseenter" ng-show="uploader.isHTML5" nowrap>\n                    {{ item.file.size/1024/1024|number:2 }} MB\n                </span>\n            </div>\n            <div class="text-right">\n                <button type="button" class="btn btn-success btn-xs" uib-tooltip="Enviar" ng-click="item.upload()" ng-disabled="item.isReady || item.isUploading || item.isSuccess">\n                    <span class="glyphicon glyphicon-upload"></span>\n                </button>\n                <button type="button" class="btn btn-warning btn-xs" uib-tooltip="Cancelar" ng-click="item.cancel()" ng-disabled="!item.isUploading">\n                    <span class="glyphicon glyphicon-ban-circle"></span>\n                </button>\n                <button type="button" uib-tooltip="Remover" class="btn btn-danger btn-xs" ng-click="deleteItem(item)">\n                    <span class="glyphicon glyphicon-remove"></span>\n                </button>\n                \n                <i ng-show="item.showLoading" class="loader glyphicon glyphicon-repeat"></i>\n\n                <span uib-tooltip="Progresso bem-sucedido" class="label label-success" ng-show="item.isSuccess">\n                    <i class="glyphicon glyphicon-ok"></i>\n                </span>\n                <span uib-tooltip="Progresso cancelado" class="label label-warning" ng-show="item.isCancel">\n                    <i class="glyphicon glyphicon-ban-circle"></i>\n                </span>\n                <span uib-tooltip="Erro no progresso" class="label label-danger" ng-show="item.isError">\n                    <i class="glyphicon glyphicon-alert"></i>\n                </span>\n            </div>\n\n            <div class="text-center" uib-tooltip="{{item.file.name}}">\n                <div ng-switch="isImage(uploader.isHTML5, item.file)">\n                    <div ng-switch-when="true" class="image-preview" ng-mouseover="hoverCrop = true" ng-mouseleave="hoverCrop = false">\n                        <i class="fa fa-cut" ng-show="hoverCrop"></i>\n                        <div ng-click="setInstance(item,$event)" data-toggle="modal" data-target="#modal-crop" ng-thumb="{file: item._file, height: 80}"></div>\n                    </div>\n                    <i ng-switch-when="false" class="glyphicon glyphicon-file"></i>\n                    \n                    <div ng-show="uploader.isHTML5">\n                        <div class="progress" style="margin-bottom: 0;">\n                            <div class="progress-bar" role="progressbar" ng-style="{ \'width\': item.progress + \'%\' }">\n                                {{item.progress + \'%\'}}\n                            </div>\n                        </div>\n                    </div>\n                </div>\n            </div>\n        </div>\n    </div>\n</div>\n\n<!-- Modal -->\n<div class="modal fade" id="modal-crop" tabindex="-1" role="dialog" aria-labelledby="myModalLabel">\n    <div class="modal-dialog" role="document">\n        <div class="modal-content">\n            <div class="modal-header">\n                <button type="button" class="close" data-dismiss="modal" aria-label="Close">\n                    <span aria-hidden="true">&times;</span>\n                </button>\n                <h4 class="modal-title" id="myModalLabel">Cortar imagem</h4>\n            </div>\n            <div class="modal-body">\n                <!-- Nav tabs -->\n                <ul class="nav nav-tabs nav-justified" role="tablist">\n                    <li role="presentation" class="active">\n                        <a role="tab" data-target="#crop" data-toggle="tab">Corte</a>\n                    </li>\n                    <li role="presentation">\n                        <a role="tab" data-target="#preview" data-toggle="tab">Pre-visualiza\xE7\xE3o</a>\n                    </li>\n                </ul>\n                <!-- Tab panes -->\n                <div class="tab-content">\n                    <div role="tabpanel" class="tab-pane active" id="crop">\n                        <div class="cropArea">\n                            <img-crop image="cropImage" result-image="cropImageResult" area-type="square" area-min-size="50" result-image-quality="1.0"\n                                result-image-size="cropSize"></img-crop>\n                        </div>\n                    </div>\n                    <div role="tabpanel" class="tab-pane" id="preview">\n                        <img ng-src="{{cropImageResult}}" width="100%" height="350" />\n                    </div>\n                </div>\n            </div>\n            <div class="modal-footer">\n                <button type="button" class="btn btn-default" data-dismiss="modal">Cancelar</button>\n                <button type="button" class="btn btn-primary" ng-click="saveCrop()">Salvar</button>\n            </div>\n        </div>\n    </div>\n</div>');}]);
+angular.module('form.uploader').run(['$templateCache', function($templateCache) {$templateCache.put('form-uploader.html','<div ng-if="uploader" class="form-uploader-container">\n\n    <div ng-switch="many">\n        <div ng-switch-when="true">\n            <input type="file" nv-file-select multiple uploader="uploader" id="file-{{elKey}}" ng-hide="true">\n            <div ng-show="uploader.isHTML5" class="{{elKey}} text-center" data-id="default" role="button">\n                <div nv-file-drop="" uploader="uploader" ng-click="openFile()">\n                    <div nv-file-over="file-over" uploader="uploader" over-class="another-file-over" class="well my-drop-zone">\n                        Arrate aqui ou clique para efetuar o upload\n                        <i class="fa fa-upload"></i>\n                    </div>\n                </div>\n            </div>\n            <p ng-if="errors!=null" ng-bind="errors" class="text-warning" ng-click="cleanMessage(\'errors\',$event)"></p>\n            <p ng-if="success!=null" ng-bind="success" class="text-success" ng-click="cleanMessage(\'success\',$event)"></p>\n        </div>\n        <div ng-switch-when="false" ng-if="uploader.queue.length==0" class="file-group-item">\n            <input type="file" nv-file-select uploader="uploader" id="file-{{elKey}}" ng-hide="true">\n            <div ng-show="uploader.isHTML5" class="{{elKey}} text-center" data-id="default" role="button">\n                <div nv-file-drop="" uploader="uploader" ng-click="openFile()">\n                    <div nv-file-over="file-over" uploader="uploader" over-class="another-file-over" class="my-drop-zone">\n                        <ng-transclude>\n                            Arrate aqui ou clique para efetuar o upload\n                            <i class="fa fa-upload"></i>\n                        </ng-transclude>\n                    </div>\n                    <p ng-if="errors!=null" ng-bind="errors" class="text-warning" ng-click="cleanMessage(\'errors\',$event)"></p>\n                    <p ng-if="success!=null" ng-bind="success" class="text-success" ng-click="cleanMessage(\'success\',$event)"></p>\n                </div>\n            </div>\n        </div>\n    </div>\n\n    <div ng-show="uploader.queue.length>1">\n        <div class="file-group">\n            <div class="col-md-4">\n                <span class="item-circled text-success fa fa-cloud-upload" ng-click="uploader.uploadAll()" ng-hide="!uploader.getNotUploadedItems().length"\n                        uib-tooltip="Enviar tudo" uib-tooltip-placement="top" uib-tooltip-trigger="mouseenter">\n                </span>\n                <button type="button" class="item-circled text-warning fa fa-ban" ng-click="uploader.cancelAll()" ng-disabled="!uploader.isUploading"\n                        uib-tooltip="Cancelar tudo" uib-tooltip-placement="top" uib-tooltip-trigger="mouseenter">\n                </button>\n                <button type="button" class="item-circled text-danger fa fa-times-circle" ng-click="deleteAll(uploader)" ng-disabled="!uploader.queue.length"\n                        uib-tooltip="Remover tudo" uib-tooltip-placement="top" uib-tooltip-trigger="mouseenter">\n                </button>\n\n                <div class="badge pull-right">\n                    Total de arquivos: {{uploader.queue.length}}\n                </div>\n            </div>\n            <div class="col-md-8">\n                <div ng-show="uploader.isHTML5">\n                    <div class="progress" style="margin-bottom: 0;">\n                        <div class="progress-bar" role="progressbar" ng-style="{ \'width\': uploader.progress + \'%\' }">{{ uploader.progress + \'%\'}}</div>\n                    </div>\n                </div>\n            </div>\n\n            <div class="clear"></div>\n        </div>\n    </div>\n\n    <div class="file-group" ng-show="uploader.queue.length>0">\n        <div ng-repeat="item in uploader.queue" class="file-group-item">\n            <div class="pull-left">\n                <span class="badge" tooltip="Size" tooltip-placement="top" tooltip-trigger="mouseenter" nowrap>\n                    {{ limitToMB(item.file.size) }} MB\n                </span>\n            </div>\n            <div class="text-right">\n                <button type="button" class="item-circled text-danger fa fa-times-circle" ng-click="deleteItem(item)"></button>\n                <button type="button" class="item-circled text-warning fa fa-ban" uib-tooltip="Cancelar" ng-click="item.cancel()" ng-disabled="!item.isUploading"></button>\n                <span class="item-circled text-success fa fa-cloud-upload" uib-tooltip="Enviar" ng-click="item.upload()" ng-hide="item.isReady || item.isUploading || item.isSuccess"></span>\n            \n                <i ng-show="item.showLoading" class="loader glyphicon glyphicon-repeat"></i>\n            \n                <span uib-tooltip="Progresso bem-sucedido" class="item-circled text-success fa fa-check-circle" ng-show="item.isSuccess"></span>\n                <span uib-tooltip="Progresso cancelado" class="item-circled text-warning fa fa-ban" ng-show="item.isCancel"></span>\n                <span uib-tooltip="Erro no progresso" class="item-circled text-danger fa fa-times-circle" ng-show="item.isError"></span>\n            </div>\n            \n            <div ng-switch="isImage(uploader.isHTML5, item.file)">\n                <div ng-switch-when="true" class="image-preview" ng-mouseover="hoverCrop = true" ng-mouseleave="hoverCrop = false">\n                    <i class="fa fa-cut" ng-show="hoverCrop"></i>\n                    <div ng-click="setInstance(item,$event)" data-toggle="modal" data-target="#modal-crop" ng-thumb="{file: item._file, height: 80}"></div>\n                </div>\n                <i ng-switch-when="false" class="glyphicon glyphicon-file"></i>\n            \n                <div ng-show="uploader.isHTML5">\n                    <div class="progress" style="margin-bottom: 0;">\n                        <div class="progress-bar" role="progressbar" ng-style="{ \'width\': item.progress + \'%\' }">\n                            {{item.progress + \'%\'}}\n                        </div>\n                    </div>\n                </div>\n            </div>\n        </div>\n    </div>\n</div>\n\n<div ng-include="\'modal-crop.html\'"></div>');
+$templateCache.put('modal-crop.html','<!-- Modal -->\n<div class="modal fade" id="modal-crop" tabindex="-1" role="dialog" aria-labelledby="myModalLabel">\n    <div class="modal-dialog" role="document">\n        <div class="modal-content">\n            <div class="modal-header">\n                <button type="button" class="close" data-dismiss="modal" aria-label="Close">\n                    <span aria-hidden="true">&times;</span>\n                </button>\n                <h4 class="modal-title" id="myModalLabel">Cortar imagem</h4>\n            </div>\n            <div class="modal-body">\n                <!-- Nav tabs -->\n                <ul class="nav nav-tabs nav-justified" role="tablist">\n                    <li role="presentation" class="active">\n                        <a role="tab" data-target="#crop" data-toggle="tab">Corte</a>\n                    </li>\n                    <li role="presentation">\n                        <a role="tab" data-target="#preview" data-toggle="tab">Pre-visualiza\xE7\xE3o</a>\n                    </li>\n                </ul>\n                <!-- Tab panes -->\n                <div class="tab-content">\n                    <div role="tabpanel" class="tab-pane active" id="crop">\n                        <div class="cropArea">\n                            <img-crop image="cropImage" result-image="$parent.cropImageResult" area-type="square" area-min-size="50" result-image-quality="1.0"\n                                result-image-size="cropSize"></img-crop>\n                        </div>\n                    </div>\n                    <div role="tabpanel" class="tab-pane" id="preview">\n                        <img ng-src="{{$parent.cropImageResult}}" width="100%" height="350" />\n                    </div>\n                </div>\n            </div>\n            <div class="modal-footer">\n                <button type="button" class="btn btn-default" data-dismiss="modal">Cancelar</button>\n                <button type="button" class="btn btn-primary" ng-click="saveCrop()">Salvar</button>\n            </div>\n        </div>\n    </div>\n</div>');}]);
 angular.module('ngThumbCanvas',[])
     // Angular File Upload module does not include this directive
     // Only for example
@@ -25,7 +28,6 @@ angular.module('ngThumbCanvas',[])
      * @version: 0.1.2, 2014-01-09
      */
     .directive('ngThumb', ['$window', function($window) {
-        console.log('bennngn');
         var helper = {
             support: !!($window.FileReader && $window.CanvasRenderingContext2D),
             isFile: function(item) {
@@ -69,11 +71,51 @@ angular.module('ngThumbCanvas',[])
             }
         };
     }]);
+angular.module('formCustomChange',[])
+.directive('customChange', [
+    function () {
+        return {
+            restrict: 'A',
+            link: function (scope, element, attrs, controller) {
+                var onChangeHandler = scope.$eval(attrs.customChange);
+                element.bind('change', onChangeHandler);
+            }
+        };
+    }
+]);
+angular.module('formDragDrop',[])
+.directive('dragDrop', function () {
+    return {
+        link: function (scope, element, attrs) {
+            element.on('dragover', function (event) {
+                event.preventDefault();
+                element.addClass(attrs.dragDropOver);
+            });
+            element.on('dragleave', function (event) {
+                event.preventDefault();
+                element.removeClass(attrs.dragDropOver);
+            });
+            element.on('drop', function (event) {
+                event.preventDefault();
+                element.removeClass(attrs.dragDropOver);
+                scope.onChangeFile({
+                    target: {
+                        files: event.originalEvent.dataTransfer.files
+                    }
+                });
+            });
+        }
+
+    };
+})
+
 angular.module('form.uploader')
-    .directive('formUploader',function(){
+.directive('formUploader',function(){
         return {
             restrict: 'E',
             templateUrl: 'form-uploader.html',
+            require: ['angularFileUpload'],
+            transclude: true,
             scope: {
                 /*
                 | ------------------------------------------------------------------------------------
@@ -115,32 +157,25 @@ angular.module('form.uploader')
                 */
                 sendUrl: '=?sendUrl'
             },
-            controller: ["$scope", "FileUploader", "$http", "$filter", function($scope, FileUploader, $http, $filter)
+            controller: ["$scope", "FileUploader", "$http", "$filter", "ImageService", function ($scope, FileUploader, $http, $filter, ImageService)
             {
-                if( angular.isUndefined($scope.sendUrl) )
-                {
+                if (angular.isUndefined($scope.sendUrl)) {
                     return console.warn("Por Favor, Defina uma 'url' para este upload");
                 }
-
                 var listFile = [];
-                var IImage = null;
-                /*
-                | ------------------------------------------------------------------------------------
-                | Default labels with the messages, for success, info or error in upload
-                | ------------------------------------------------------------------------------------
-                */
-                $scope.messages = {danger: null, success: null, info: null};
-                
+
+                $scope.errors = null;
+                $scope.success = null;
                 $scope.many = angular.isUndefined($scope.many) ? false : $scope.many;
                 $scope.validators = angular.isUndefined($scope.validators) ? [] : $scope.validators;
                 $scope.removeUrl = angular.isUndefined($scope.removeUrl) ? null : $scope.removeUrl;
                 $scope.defaultLimit = angular.isUndefined($scope.defaultLimit) ? (3 * 1024 * 1024) : $scope.defaultLimit;
+                var el = $scope.elKey = ImageService.getElementKey();
                 
-                $scope.cleanMessage = function(item)
-                {
-                    $scope.messages[item] = null;
+                $scope.cleanMessage = function(item,event) {
+                    event.stopPropagation();
+                    $scope[item] = null;
                 };
-
                 /*
                 | ------------------------------------------------------------------------------------
                 | Call the event click in input#file
@@ -149,23 +184,12 @@ angular.module('form.uploader')
                 $scope.openFile = function ()
                 {
                     var $el = angular.element;
-                    $el(document).off('click.upFile').on('click.upFile', '.upFile', function ()
+                    $el(document).off('click.'+el).on('click.'+el, '.'+el, function ()
                     {
-                        $el("#file").off('click').trigger('click');
+                        $el("#file-"+el).off('click').trigger('click');
                     });
                 };
                 
-                /*
-                | ------------------------------------------------------------------------------------
-                | Validate the type of file uploaded
-                | ------------------------------------------------------------------------------------
-                */
-                $scope.isImage = function(isHtml5, file){
-                    if( /(gif|jpg|jpeg|png|x-png|pjpeg)/.test(file.type) )
-                        return isHtml5;
-                    return false;
-                }
-
                 /*
                 | ------------------------------------------------------------------------------------
                 | Delete one currently file uploaded
@@ -173,12 +197,12 @@ angular.module('form.uploader')
                 */
                 $scope.deleteItem = function(item)
                 {
-                    if( 'uploadedPath' in item && $scope.removeUrl != null )
+                    if( !$scope.uploadOnSubmit && 'uploadedPath' in item && $scope.removeUrl != null )
                     {
                         item.showLoading = true;                        
                         removeFile([item.uploadedPath], function(reason){
                             item.showLoading = false;
-                            $scope.messages.success = reason.data.message;
+                            $scope.success = reason.data.message;
                             item.remove();
                         });
                     }
@@ -199,7 +223,7 @@ angular.module('form.uploader')
                     {
                         removeFile(listFile, function(reason){
                             listFile = [];
-                            $scope.messages.success = reason.data.message;
+                            $scope.success = reason.data.message;
                             uploader.clearQueue();
                         });
                     }
@@ -209,61 +233,20 @@ angular.module('form.uploader')
                     }
                 };
 
-                /**
-                | ------------------------------------------------------------------------------------
-                | Store the currente file selected to be crop and update
-                | ------------------------------------------------------------------------------------
-                * @param {object} instance the current file item instance
-                */
-                $scope.setInstance = function (instance, event) {
-                    $scope.cropImage = '';
-                    $scope.cropImageResult = '';
-                    $scope.cropSize = 600;
-                    IImage = instance;
-                    IImage.element = event;
-
-                    var reader = new FileReader();
-                    reader.onload = function (evt) {
-                        $scope.$apply(function () {
-                            $scope.cropImage = evt.target.result;
-                            var image = new Image();
-                            image.onload = function () {
-                                $scope.cropSize = this.width;
-                            };
-                            image.src = $scope.cropImage;
-                            delete image;
-                        });
-                    };
-                    reader.readAsDataURL(instance._file);
+                $scope.isImage = function (isHtml5, file) {
+                    return ImageService.isImage(isHtml5, file.type);
                 };
 
-                /**
-                | ------------------------------------------------------------------------------------
-                | crop and update the image to be upload
-                | ------------------------------------------------------------------------------------
-                */
+                $scope.limitToMB = function (value) {
+                    return ImageService.limitToMB(value);
+                };
+
+                $scope.setInstance = function (instance, event) {
+                    ImageService.setCrop($scope, instance, event);
+                };
+
                 $scope.saveCrop = function () {
-                    var arr = $scope.cropImageResult.split(','),
-                        bstr = atob(arr[1]),
-                        n = bstr.length,
-                        u8arr = new Uint8Array(n);
-
-                    while (n--) {
-                        u8arr[n] = bstr.charCodeAt(n);
-                    }
-                    
-                    var target = IImage.element.target;
-                    var file = new File([u8arr], IImage.file.name, { type: IImage.file.type });
-                    var image = new Image();
-
-                    image.onload = function() {
-                        target.getContext('2d').drawImage(this, 0, 0, target.width, target.height);
-                    };
-                    image.src = $scope.cropImageResult;
-                    
-                    IImage._file = file;
-                    angular.element(document.getElementById('modal-crop')).modal('hide');
-                    delete image;
+                    ImageService.saveCrop($scope);
                 };
                 
                 /*
@@ -280,9 +263,10 @@ angular.module('form.uploader')
                         .then(function (reason) {
                             callback(reason);
                         }, function (err) {
-                            $scope.messages.danger = err.data.message;
+                            $scope.errors = err.data.message;
                         });
                 }
+                
                 /*
                 | ------------------------------------------------------------------------------------
                 | upload images by ajax with FileUploader
@@ -292,45 +276,8 @@ angular.module('form.uploader')
                     url: $scope.sendUrl,
                     queueLimit: $scope.defaultLimit
                 });
-
-                var filters = $scope.validators;
-
-                /*
-                | ------------------------------------------------------------------------------------
-                | Set filter by type of file, when the 'allowType' is declared
-                | ------------------------------------------------------------------------------------
-                */
-                if( !(angular.isUndefined($scope.allowType)) )
-                {
-                    filters.push({
-                        name: 'typeAllow',
-                        fn: function(item /*{File|FileLikeObject}*/, options) {
-                            var regex = new RegExp($scope.allowType, "i");
-                            var validation = regex.test(item.name);
-                            if( !(validation) )
-                                $scope.messages.info = "Extensão inválida, o arquivo deve ser '"+$scope.allowType.replace(/(\|)/ig,", ")+"'";
-                            return validation;
-                        }
-                    });
-                }
-
-                /*
-                | ------------------------------------------------------------------------------------
-                | Set filter for max size of the file uploaded
-                | ------------------------------------------------------------------------------------
-                */
-                filters.push({
-                    name: 'sizeAllow',
-                    fn: function(item /*{File|FileLikeObject}*/, options) {
-                        var validation = item.size > $scope.defaultLimit;
-                        if( validation )
-                            $scope.messages.info = "O arquivo excedeu o tamanho máximo permitido "+$filter('number')($scope.defaultLimit,2)+"MB";
-
-                        return !validation;
-                    }
-                });
-
-                uploader.filters = filters;
+                ImageService.setDefaultValidators($scope.allowType, $scope.defaultLimit);
+                uploader.filters = ImageService.getValidators($scope.validators);
 
                 /*
                 | ------------------------------------------------------------------------------------
@@ -352,9 +299,11 @@ angular.module('form.uploader')
                     item.showLoading = true;
                     $scope.$root.$broadcast('form.uploader.begin');
                 };
-                uploader.onCancelItem = function (fileItem, response, status, headers)
-                {
-                    $scope.messages.info = "Envio abortado com sucess!";                   
+                uploader.onWhenAddingFileFailed = function (item, filter, options) {
+                    $scope.errors = ImageService.getError(filter.name);
+                };
+                uploader.onCancelItem = function (fileItem, response, status, headers){
+                    $scope.errors = "Envio abortado com sucess!";                   
                 };
                 /*
                 | ------------------------------------------------------------------------------------
@@ -376,11 +325,11 @@ angular.module('form.uploader')
                         {
                             fileItem.uploadedPath = response.path;
                             listFile.push(response.path);
-                            $scope.messages.success = response.message;
+                            $scope.success = response.message;
                         }
                         else
                         {
-                            $scope.messages.danger = response.message;
+                            $scope.errors = response.message;
                         }
                     }
                     $scope.$root.$broadcast('form.uploader.finish', response);
@@ -416,3 +365,164 @@ angular.module('form.uploader')
             return string;
         }
     });
+angular.module('form.uploader')
+    .factory('ImageService',["$filter", function($filter){
+        var IImage = null;
+        var filters = [];
+        var errors = {};
+
+        /**
+        | ------------------------------------------------------------------------------------
+        | Store the currente file selected to be crop and update
+        | ------------------------------------------------------------------------------------
+        * @param {scope} scope the scope of the controller called
+        * @param {object} instance the current file item instance
+        * @param {object} event the current element
+        */
+        var setCrop = function(scope, instance, event) {
+            scope.cropImage = '';
+            scope.cropImageResult = '';
+            scope.cropSize = 600;
+            IImage = instance;
+            IImage.element = event;
+
+            var reader = new FileReader();
+            reader.onload = function (evt) {
+                scope.$apply(function () {
+                    scope.cropImage = evt.target.result;
+                    var image = new Image();
+                    image.onload = function () {
+                        scope.cropSize = this.width;
+                    };
+                    image.src = scope.cropImage;
+                    delete image;
+                });
+            };
+            reader.readAsDataURL(instance._file);
+        };
+
+        /**
+        | ------------------------------------------------------------------------------------
+        | crop and update the image to be upload
+        | ------------------------------------------------------------------------------------
+        * @param {scope} scope the scope of the controller called
+        */
+        var saveCrop = function(scope) {
+            var arr = scope.cropImageResult.split(','),
+                bstr = atob(arr[1]),
+                n = bstr.length,
+                u8arr = new Uint8Array(n);
+
+            while (n--) {
+                u8arr[n] = bstr.charCodeAt(n);
+            }
+
+            var target = IImage.element.target;
+            var file = new File([u8arr], IImage.file.name, { type: IImage.file.type });
+            var image = new Image();
+
+            image.onload = function () {
+                target.getContext('2d').drawImage(this, 0, 0, target.width, target.height);
+            };
+            image.src = scope.cropImageResult;
+
+            IImage._file = file;
+            angular.element(document.getElementById('modal-crop')).modal('hide');
+            delete image;
+        };
+
+        /**
+        | ------------------------------------------------------------------------------------
+        | Set filter by type of file, when the 'allowType' is declared
+        | Set filter for max size of the file uploaded
+        | ------------------------------------------------------------------------------------
+        * @param {string} type the extension allowed
+        * @param {string} size the limit of the file allowed
+        */
+        var setDefaultValidators = function(type, size) {
+            if (angular.isDefined(type)){
+                setValidator('typeAllow', type, "rx", "A extensão deve ser '" + type.replace(/(\|)/ig, ", ") + "'");
+            }
+            setValidator('sizeAllow', size, "lt", "O tamanho deve ter até " + limitToMB(size) + "MB");
+        };
+
+        /**
+        | ------------------------------------------------------------------------------------
+        | Add a validation to this uploda
+        | ------------------------------------------------------------------------------------
+        * @param {string} name the name of the validator
+        * @param {string|int} value the value to be validator
+        * @param {string|function} type the kind of the validator
+        * @param {string} message the message of error
+        */
+        var setValidator = function(name, values, type, message) {
+            filters.push({
+                name: name,
+                fn: function (item /*{File|FileLikeObject}*/, options) {
+                    var validation = true;
+                    switch (type) {
+                        case 'rx':
+                            var regex = new RegExp(values, "i");
+                            validation = regex.test(item.name);
+                            break;
+                        case 'lt':
+                            validation = item.size < values;
+                            break;
+                        default:
+                            if (typeof type == 'function')
+                                validation = type(item, value);
+                            break;
+                    }
+                    if (!(validation))
+                        errors[name] = message;
+                    return validation;
+                }
+            });
+        };
+
+        /**
+        | ------------------------------------------------------------------------------------
+        | Get the list of the validations to this upload
+        | ------------------------------------------------------------------------------------
+        * @param {array} customs the list of the custom validators
+        */
+        var getValidators = function(customs) {
+            if(customs.length>0){
+                customs.map(function(r) {
+                    setValidator(r.name, r.values, r.type, r.message);
+                });
+            }
+            return filters;
+        };
+
+        /*
+        | ------------------------------------------------------------------------------------
+        | Validate the type of file uploaded
+        | ------------------------------------------------------------------------------------
+        */
+        var isImage = function(isHtml5, type) {
+            if (/(gif|jpg|jpeg|png|x-png|pjpeg)/.test(type))
+                return isHtml5;
+            return false;
+        };
+
+        var limitToMB = function(value) {
+            return $filter('number')(value / 1024 / 1024, 0);
+        };
+
+        return {
+            setCrop: setCrop,
+            saveCrop: saveCrop,
+            getValidators: getValidators,
+            setValidator: setValidator,
+            setDefaultValidators: setDefaultValidators,
+            isImage: isImage,
+            limitToMB: limitToMB,
+            getError: function(name) {
+                return errors[name] || null;
+            },
+            getElementKey: function() {
+                return "file-item-"+Math.floor((Math.random() * Date.now()) + 1);
+            } 
+        }
+    }]);
