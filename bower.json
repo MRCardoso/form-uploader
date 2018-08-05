@@ -1,9 +1,9 @@
 {
   "name": "form-uploader",
-  "version": "0.2.0",
+  "version": "0.3.0",
   "license": "MIT",
   "homepage": "https://github.com/MRCardoso/form-uploader",
-  "description": "Create a template for upload files",
+  "description": "Directive to upload files with angular-file-upload",
   "main": [
     "dist/form-uploader.js",
     "dist/form-uploader.css"
@@ -27,7 +27,7 @@
     "tests"
   ],
   "dependencies": {
-    "angular": "^1.6.5",
+    "angular": "1.5.x",
     "angular-file-upload": "^2.5.0",
     "ng-img-crop": "ngImgCrop#^0.3.2"
   },
