@@ -4,6 +4,7 @@ angular.module('form.uploader')
             restrict: 'E',
             templateUrl: 'form-uploader.html',
             require: ['angularFileUpload'],
+            transclude: true,
             scope: {
                 /*
                 | ------------------------------------------------------------------------------------
@@ -52,18 +53,18 @@ angular.module('form.uploader')
                 }
                 var listFile = [];
 
-                $scope.messages = {danger: null, success: null, info: null};
+                $scope.errors = null;
+                $scope.success = null;
                 $scope.many = angular.isUndefined($scope.many) ? false : $scope.many;
                 $scope.validators = angular.isUndefined($scope.validators) ? [] : $scope.validators;
                 $scope.removeUrl = angular.isUndefined($scope.removeUrl) ? null : $scope.removeUrl;
                 $scope.defaultLimit = angular.isUndefined($scope.defaultLimit) ? (3 * 1024 * 1024) : $scope.defaultLimit;
                 var el = $scope.elKey = ImageService.getElementKey();
                 
-                $scope.cleanMessage = function(item)
-                {
-                    $scope.messages[item] = null;
+                $scope.cleanMessage = function(item,event) {
+                    event.stopPropagation();
+                    $scope[item] = null;
                 };
-
                 /*
                 | ------------------------------------------------------------------------------------
                 | Call the event click in input#file
@@ -90,7 +91,7 @@ angular.module('form.uploader')
                         item.showLoading = true;                        
                         removeFile([item.uploadedPath], function(reason){
                             item.showLoading = false;
-                            $scope.messages.success = reason.data.message;
+                            $scope.success = reason.data.message;
                             item.remove();
                         });
                     }
@@ -111,7 +112,7 @@ angular.module('form.uploader')
                     {
                         removeFile(listFile, function(reason){
                             listFile = [];
-                            $scope.messages.success = reason.data.message;
+                            $scope.success = reason.data.message;
                             uploader.clearQueue();
                         });
                     }
@@ -151,7 +152,7 @@ angular.module('form.uploader')
                         .then(function (reason) {
                             callback(reason);
                         }, function (err) {
-                            $scope.messages.danger = err.data.message;
+                            $scope.errors = err.data.message;
                         });
                 }
                 
@@ -187,9 +188,11 @@ angular.module('form.uploader')
                     item.showLoading = true;
                     $scope.$root.$broadcast('form.uploader.begin');
                 };
-                uploader.onCancelItem = function (fileItem, response, status, headers)
-                {
-                    $scope.messages.info = "Envio abortado com sucess!";                   
+                uploader.onWhenAddingFileFailed = function (item, filter, options) {
+                    $scope.errors = ImageService.getError(filter.name);
+                };
+                uploader.onCancelItem = function (fileItem, response, status, headers){
+                    $scope.errors = "Envio abortado com sucess!";                   
                 };
                 /*
                 | ------------------------------------------------------------------------------------
@@ -211,11 +214,11 @@ angular.module('form.uploader')
                         {
                             fileItem.uploadedPath = response.path;
                             listFile.push(response.path);
-                            $scope.messages.success = response.message;
+                            $scope.success = response.message;
                         }
                         else
                         {
-                            $scope.messages.danger = response.message;
+                            $scope.errors = response.message;
                         }
                     }
                     $scope.$root.$broadcast('form.uploader.finish', response);

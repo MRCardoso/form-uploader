@@ -84,23 +84,6 @@ $rootScope.$on('form.uploader.finish', function(e){
 });
 ```
 
-## simple-uploader
-* **defaultLimit:** Int, (default 3MB) The max size of the file uploaded
-* **fileItem:** ngModel, the scope model to be store the uploaded file
-* **allowType:** String, (default: undefined e.g.:[jpg|gif|png]) The allowed extensions to the upload, by default all extensions are allowed
-* **validators:** Array, (default: []) A list of array with filters for the upload, an array of objects with properties:
-    * **name:** the name of the filter
-    * **fn:** the function with the rule of the filter, has two arguments(item, options)
-
-```Html
-<simple-uploader 
-    [allow-type="String"]
-    [default-limit="Int"]
-    [file-item="ngModel"]
-    [validators="Array({name: String, values: String|Int, type: String|Function, message: String})"]>
-</simple-upload>
-```
-
 ## Changelog
 
 Please see the [releases page](https://github.com/MRCardoso/form-uploader/releases) for details
