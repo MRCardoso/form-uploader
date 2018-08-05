@@ -140,7 +140,7 @@ angular.module('form.uploader')
         };
 
         var limitToMB = function(value) {
-            return $filter('number')(value / 1024 / 1024, 0);
+            return $filter('number')(value / 1024 / 1024, 2);
         };
 
         return {
