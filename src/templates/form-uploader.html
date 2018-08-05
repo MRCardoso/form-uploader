@@ -1,17 +1,4 @@
 <div ng-if="uploader" class="form-uploader-container">
-    <div ng-repeat="(type, msg) in messages">
-        <div ng-show="msg" class="alert alert-{{type}} alert-dismissible flash" role="alert">
-            <button type="button" ng-click="cleanMessage(type)" class="close">
-                <span aria-hidden="true">&times;</span>
-            </button>
-            <strong>
-                <i ng-class="{'fa-warning': type=='danger', 'fa-info': type=='info', 'fa-check': type=='success'}" class="fa"></i>
-            </strong>
-            {{msg}}
-        </div>
-    </div>
-
-    <div class="clear"></div>
 
     <div ng-switch="many">
         <div ng-switch-when="true">
