@@ -24,12 +24,14 @@
                     </div>
                 </div>
             </div>
+            <p ng-if="errors!=null" ng-bind="errors" class="text-warning" ng-click="cleanMessage('errors',$event)"></p>
+            <p ng-if="success!=null" ng-bind="success" class="text-success" ng-click="cleanMessage('success',$event)"></p>
         </div>
         <div ng-switch-when="false" ng-if="uploader.queue.length==0" class="file-group-item">
             <input type="file" nv-file-select uploader="uploader" id="file-{{elKey}}" ng-hide="true">
             <div ng-show="uploader.isHTML5" class="{{elKey}} text-center" data-id="default" role="button">
                 <div nv-file-drop="" uploader="uploader" ng-click="openFile()">
-                    <div nv-file-over="file-over" uploader="uploader" over-class="another-file-over" class="well my-drop-zone">
+                    <div nv-file-over="file-over" uploader="uploader" over-class="another-file-over" class="my-drop-zone">
                         <ng-transclude>
                             Arrate aqui ou clique para efetuar o upload
                             <i class="fa fa-upload"></i>
